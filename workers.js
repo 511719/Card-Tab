@@ -4,7 +4,7 @@ const HTML_CONTENT = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card Tab</title>
+    <title>CardTab</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>⭐</text></svg>">
     <style>
     /* 全局样式 */
@@ -2003,27 +2003,131 @@ const HTML_CONTENT = `
         }
     }
 
+    /* ----------   1️⃣ 全屏遮罩  ---------- */
+.login-modal-full {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+/* ----------   2️⃣ 弹窗主体  ---------- */
+.login-modal-content-full {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    background: #fff;
+    color: #222;
+    box-sizing: border-box;
+    padding: 2rem;
+    overflow: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ----------   3️⃣ 标题  ---------- */
+.login-modal-content-full h3 {
+    margin: 0 0 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ----------   4️⃣ 输入框  ---------- */
+.login-modal-content-full input {
+    width: 100%;
+    max-width: 320px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* ----------   5️⃣ 按钮容器  ---------- */
+.login-modal-buttons-full {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* ----------   6️⃣ 按钮本身  ---------- */
+.login-modal-buttons-full button {
+    min-width: 80px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    transition: background-color .2s;
+}
+
+/* 取消按钮 */
+.cancel-full {
+    background: #f0f0f0;
+    color: #333;
+}
+.cancel-full:hover { background: #e0e0e0; }
+
+/* 确定按钮（主色） */
+.login-modal-buttons-full button:not(.cancel-full) {
+    background: #43b883;
+    color: #fff;
+}
+.login-modal-buttons-full button:not(.cancel-full):hover {
+    background: #35a674;
+}
+
+/* ----------   7️⃣ 暗色主题（可选）  ---------- */
+body.dark-theme .login-modal-content-full {
+    background: #252830;
+    color: #e3e3e3;
+}
+body.dark-theme .login-modal-content-full input {
+    background: #323642;
+    color: #e3e3e3;
+    border-color: #444;
+}
+body.dark-theme .cancel-full {
+    background: #4a4e5a;
+    color: #e3e3e3;
+}
+body.dark-theme .login-modal-buttons-full button:not(.cancel-full) {
+    background: #5d7fb9;
+}
+body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
+    background: #5473a9;
+}
 
     </style>
 </head>
 
 <body>
     <div class="fixed-elements">
-        <h3><span class="weather-mini" id="weather-mini" onclick="openWeatherModal()"><span class="weather-loading">加载中...</span></span></h3>
+        <!-- <h3><span class="weather-mini" id="weather-mini" onclick="openWeatherModal()"><span class="weather-loading">加载中...</span></span></h3> -->
         <div class="center-content">
             <!-- 一言模块 -->
             <p id="hitokoto">
                 <a href="#" id="hitokoto_text"></a>
             </p>
-            <script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script>
+            <!-- <script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script> -->
             <!-- 搜索栏 -->
             <div class="search-container">
                 <div class="search-bar">
                     <select id="search-engine-select">
                         <option value="baidu">百度</option>
                         <option value="bing">必应</option>
-                        <option value="google">谷歌</option>
-                        <option value="duckduckgo">DuckDuckGo</option>
                     </select>
                     <input type="text" id="search-input" placeholder="">
                     <button id="search-button">🔍</button>
@@ -2032,14 +2136,16 @@ const HTML_CONTENT = `
             <div id="category-buttons-container" class="category-buttons-container"></div>
         </div>
         <!-- 右上角控制区域 -->
-        <div class="top-right-controls">
+        <div class="top-right-controls">            
             <button class="admin-btn" id="admin-btn" onclick="toggleAdminMode()" style="display: none;">设置</button>
             <button class="login-btn" id="login-btn" onclick="handleLoginClick()">登录</button>
+            <!-- 
             <button class="github-btn has-tooltip tooltip-bottom tooltip-green" onclick="openGitHub()" data-tooltip="喜欢请点个star">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
             </button>
+             -->
             <div class="bookmark-search-toggle" onclick="toggleBookmarkSearch()">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
@@ -2122,7 +2228,7 @@ const HTML_CONTENT = `
                 </div>
             </div>
         </div>
-        <!-- 登录弹窗 -->
+        <!-- 登录弹窗 
         <div id="login-modal" class="login-modal">
             <div class="login-modal-content">
                 <h3>登录</h3>
@@ -2131,6 +2237,18 @@ const HTML_CONTENT = `
                     <button class="cancel" onclick="hideLoginModal()">取消</button>
                     <button onclick="performLogin()">确定</button>
                 </div>
+            </div>
+        </div>
+        -->
+
+        <div id="login-modal" class="login-modal-full">
+            <div class="login-modal-content-full">
+            <h3>登录</h3>
+            <input type="password" id="login-password" placeholder="请输入密码">
+            <div class="login-modal-buttons-full">
+                <!-- <button class="cancel-full" onclick="hideLoginModal()">取消</button> -->
+                <button onclick="performLogin()">确定</button>
+            </div>
             </div>
         </div>
 
@@ -2182,9 +2300,7 @@ const HTML_CONTENT = `
     // 搜索引擎配置
     const searchEngines = {
         baidu: "https://www.baidu.com/s?wd=",
-        bing: "https://www.bing.com/search?q=",
-        google: "https://www.google.com/search?q=",
-        duckduckgo: "https://duckduckgo.com/?q="
+        bing: "https://www.bing.com/search?q="
     };
 
     let currentEngine = "baidu";
@@ -3328,6 +3444,7 @@ const HTML_CONTENT = `
         });
         await loadLinks();
         logAction('重新加载卡片（管理员模式）');
+        hideLoginModal();
     }
 
     // 处理登录按钮点击
@@ -3346,6 +3463,10 @@ const HTML_CONTENT = `
 
     // 显示登录弹窗
     function showLoginModal() {
+        if(isLoggedIn){
+            hideLoginModal();
+            return;
+        }
         document.getElementById('login-modal').style.display = 'flex';
         document.getElementById('login-password').focus();
     }
@@ -3397,6 +3518,7 @@ const HTML_CONTENT = `
         await customAlert('退出登录成功！', '退出登录');
         updateUIState();
         logAction('退出登录');
+        showLoginModal();
     }
 
     // 更新按钮状态
@@ -3415,6 +3537,7 @@ const HTML_CONTENT = `
         } else {
             loginBtn.textContent = '登录';
             adminBtn.style.display = 'none';
+            showLoginModal();
         }
     }
 
@@ -3973,6 +4096,14 @@ const HTML_CONTENT = `
         try {
             await validateToken();
             updateLoginButton();
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                isLoggedIn = false;
+                updateUIState();
+                showLoginModal();
+                return false;
+            }
+            hideLoginModal();
             await loadLinks();
             // 初始加载完成后，检测当前可见分类
             setTimeout(setActiveCategoryButtonByVisibility, 500);
@@ -4539,6 +4670,7 @@ const HTML_CONTENT = `
     }
 
     // 页面加载时初始化天气
+
     document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
             console.log('开始初始化天气组件...');
@@ -4546,8 +4678,8 @@ const HTML_CONTENT = `
                 console.error('天气初始化失败:', err);
                 document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">加载失败</span>';
             });
-        }, 500); // 延迟加载，优先加载主内容
-    });
+        }, 500); // 延迟加载，优先加载主内容       
+    }); 
 
     </script>
 
@@ -4596,7 +4728,7 @@ function constantTimeCompare(a, b) {
 
 // 服务端 token 验证
 async function validateServerToken(authToken, env) {
-    if (!authToken) {
+    if (!authToken) {        
         return {
             isValid: false,
             status: 401,
