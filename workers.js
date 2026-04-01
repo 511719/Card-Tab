@@ -4134,7 +4134,7 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             });
 
             if (response.status === 401) {
-                await resetToLoginState('token已过期，请重新登录');
+                await resetToLoginState('登录时间已过期，请重新登录');
                 return false;
             }
 
