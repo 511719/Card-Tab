@@ -51,7 +51,7 @@ const HTML_CONTENT = `
         color: #43b883;
         border: none;
         cursor: pointer;
-        font-size: 12px;
+        font-size: 17px;
         font-weight: 500;
         transition: all 0.2s ease;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -1074,13 +1074,13 @@ const HTML_CONTENT = `
     }
 
     .card-icon {
-        width: 16px;
-        height: 16px;
+        width: 26px;
+        height: 26px;
         margin-right: 5px;
     }
 
     .card-title {
-        font-size: 15px;
+        font-size: 19px;
         font-weight: 600;
         color: #222;
         white-space: nowrap;
