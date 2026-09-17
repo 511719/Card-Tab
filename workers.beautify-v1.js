@@ -1,0 +1,4669 @@
+const HTML_CONTENT = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardTab</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>⭐</text></svg>">
+    <style>
+    /* ============================================================
+       CardTab 主题 —— 美化版
+       设计基调：柔和玻璃拟态 + 呼吸感光斑背景 + 渐变品牌色
+       字体整体放大，保证舒适阅读；暗色/亮色通过 CSS 变量切换
+       ============================================================ */
+
+    /* ---------- 设计变量 ---------- */
+    body {
+        --bg: #f2f6f3;
+        --bg-glow-1: rgba(67, 184, 131, 0.18);
+        --bg-glow-2: rgba(93, 127, 185, 0.16);
+        --bg-glow-3: rgba(255, 190, 120, 0.14);
+        --panel: rgba(255, 255, 255, 0.72);
+        --panel-solid: #ffffff;
+        --panel-border: rgba(255, 255, 255, 0.7);
+        --line: rgba(31, 41, 55, 0.09);
+        --text: #26334a;
+        --text-2: #5d6b7e;
+        --text-3: #8b96a6;
+        --brand: #2fae7d;
+        --brand-deep: #279a6b;
+        --brand-soft: rgba(47, 174, 125, 0.15);
+        --brand-grad: linear-gradient(135deg, #38c98c 0%, #2fae7d 55%, #28a39a 100%);
+        --accent: #5d7fb9;
+        --accent-soft: rgba(93, 127, 185, 0.15);
+        --danger: #e74c3c;
+        --warn: #ff9800;
+        --shadow-sm: 0 2px 10px rgba(31, 45, 61, 0.06);
+        --shadow-md: 0 10px 30px rgba(31, 45, 61, 0.11);
+        --shadow-lg: 0 18px 50px rgba(31, 45, 61, 0.17);
+        --radius-sm: 10px;
+        --radius: 14px;
+        --radius-lg: 20px;
+        --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color-scheme: light;
+    }
+
+    body.dark-theme {
+        --bg: #0d1117;
+        --bg-glow-1: rgba(67, 184, 131, 0.10);
+        --bg-glow-2: rgba(93, 127, 185, 0.13);
+        --bg-glow-3: rgba(124, 92, 186, 0.11);
+        --panel: rgba(24, 29, 40, 0.78);
+        --panel-solid: #1a2029;
+        --panel-border: rgba(255, 255, 255, 0.09);
+        --line: rgba(255, 255, 255, 0.08);
+        --text: #e7ecf4;
+        --text-2: #9fb0c3;
+        --text-3: #6c7a8d;
+        --brand: #5d7fb9;
+        --brand-deep: #4a6fa5;
+        --brand-soft: rgba(93, 127, 185, 0.16);
+        --brand-grad: linear-gradient(135deg, #7298d6 0%, #5d7fb9 55%, #4a6fa5 100%);
+        --accent: #43b883;
+        --accent-soft: rgba(67, 184, 131, 0.15);
+        --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.28);
+        --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.38);
+        --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5);
+        color-scheme: dark;
+    }
+
+    /* ---------- 基础与呼吸感背景 ---------- */
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        min-height: 100%;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: var(--font);
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--text);
+        background-color: var(--bg);
+        background-image:
+            radial-gradient(1100px 700px at 88% -12%, var(--bg-glow-2), transparent 60%),
+            radial-gradient(950px 650px at -12% 22%, var(--bg-glow-1), transparent 55%),
+            radial-gradient(900px 700px at 50% 125%, var(--bg-glow-3), transparent 60%);
+        background-attachment: fixed;
+        transition: background-color 0.4s ease, color 0.4s ease;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* 缓慢漂移的装饰光斑，赋予页面生命力 */
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        z-index: -1;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        pointer-events: none;
+        will-change: transform;
+    }
+
+    body::before {
+        width: 520px;
+        height: 520px;
+        top: -140px;
+        left: -120px;
+        background: var(--bg-glow-1);
+        animation: aurora-a 26s ease-in-out infinite alternate;
+    }
+
+    body::after {
+        width: 620px;
+        height: 620px;
+        right: -160px;
+        bottom: -160px;
+        background: var(--bg-glow-2);
+        animation: aurora-b 32s ease-in-out infinite alternate;
+    }
+
+    @keyframes aurora-a {
+        0%   { transform: translate(0, 0) scale(1); }
+        50%  { transform: translate(80px, 60px) scale(1.15); }
+        100% { transform: translate(20px, 120px) scale(0.95); }
+    }
+
+    @keyframes aurora-b {
+        0%   { transform: translate(0, 0) scale(1); }
+        50%  { transform: translate(-90px, -50px) scale(1.1); }
+        100% { transform: translate(-30px, -100px) scale(1.22); }
+    }
+
+    ::selection {
+        background: var(--brand-soft);
+        color: var(--text);
+    }
+
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--brand);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--brand-deep);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+
+    /* ---------- 顶部固定区域 ---------- */
+    .fixed-elements {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: 158px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 64px 8px;
+        background: var(--panel);
+        backdrop-filter: blur(18px) saturate(1.4);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
+        border-bottom: 1px solid var(--panel-border);
+        box-shadow: var(--shadow-sm);
+        transition: background-color 0.4s ease;
+    }
+
+    /* 站点标题 + 迷你天气 */
+    .fixed-elements h3 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--text);
+        z-index: 10;
+    }
+
+    .site-title .brand {
+        display: inline-flex;
+        align-items: center;
+        font-size: 26px;
+    }
+
+    .site-title .brand::before {
+        content: '';
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--brand-grad);
+        margin-right: 10px;
+        animation: brandPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes brandPulse {
+        0%, 100% { box-shadow: 0 0 6px var(--brand); }
+        50%      { box-shadow: 0 0 18px var(--brand); }
+    }
+
+    /* 迷你天气胶囊 */
+    .weather-mini {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 15px;
+        border-radius: 999px;
+        background: var(--brand-soft);
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        vertical-align: middle;
+        transition: all 0.25s ease;
+    }
+
+    .weather-mini:hover {
+        transform: translateY(-2px);
+        border-color: var(--brand);
+        box-shadow: 0 6px 18px var(--brand-soft);
+    }
+
+    .weather-mini .weather-icon { font-size: 17px; }
+    .weather-mini .weather-temp { font-weight: 700; color: var(--brand); }
+    .weather-mini .weather-city { color: var(--text-2); font-size: 13px; }
+    .weather-mini .weather-loading { color: var(--text-3); font-size: 13px; }
+
+    /* 中心内容 */
+    .center-content {
+        width: 100%;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    /* 搜索栏 */
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .search-bar {
+        display: flex;
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto 12px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: var(--panel);
+        border: 1.5px solid var(--panel-border);
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--brand-soft), var(--shadow-md);
+        transform: translateY(-1px);
+    }
+
+    .search-bar select {
+        border: none;
+        background-color: transparent;
+        padding: 12px 34px 12px 18px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--brand);
+        width: 128px;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%232fae7d" d="M0 0l6 6 6-6z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        border-right: 1px solid var(--line);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-theme .search-bar select {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%235d7fb9" d="M0 0l6 6 6-6z"/></svg>');
+    }
+
+    .search-bar input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        padding: 12px 18px;
+        font-size: 16px;
+        background-color: transparent;
+        color: var(--text);
+        outline: none;
+    }
+
+    .search-bar input::placeholder {
+        color: var(--text-3);
+    }
+
+    .search-bar button {
+        border: none;
+        background: var(--brand-grad);
+        color: #fff;
+        padding: 0 26px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: filter 0.3s ease, transform 0.2s ease;
+    }
+
+    .search-bar button:hover {
+        filter: brightness(1.08);
+    }
+
+    .search-bar button:active {
+        transform: scale(0.96);
+    }
+
+    select option {
+        background-color: var(--panel-solid);
+        color: var(--text);
+        padding: 8px;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    /* 分类快捷按钮 */
+    .category-buttons-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 4px 12px 0;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        max-height: 40px;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .category-buttons-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-button {
+        padding: 7px 16px;
+        border-radius: 999px;
+        background: var(--panel);
+        color: var(--brand);
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.25s ease;
+        flex: 0 0 auto;
+        white-space: nowrap;
+        position: relative;
+    }
+
+    .category-button:hover {
+        background: var(--brand);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .category-button.active {
+        background: var(--brand-grad);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px var(--brand-soft);
+        font-weight: 700;
+    }
+
+    /* ---------- 右上角控制区 ---------- */
+    .top-right-controls {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 1001;
+    }
+
+    .admin-btn,
+    .login-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 22px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        color: #fff;
+        background: var(--brand-grad);
+        box-shadow: 0 6px 16px var(--brand-soft);
+        transition: all 0.25s ease;
+    }
+
+    .admin-btn:hover,
+    .login-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+        box-shadow: var(--shadow-md);
+    }
+
+    .admin-btn:active,
+    .login-btn:active {
+        transform: translateY(0) scale(0.97);
+    }
+
+    /* 书签搜索按钮 */
+    .bookmark-search-toggle {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--brand-grad);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 6px 16px var(--brand-soft);
+        transition: all 0.25s ease;
+    }
+
+    .bookmark-search-toggle:hover {
+        transform: translateY(-2px) rotate(6deg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .bookmark-search-toggle svg {
+        width: 21px;
+        height: 21px;
+        stroke: currentColor;
+    }
+
+    .bookmark-search-dropdown {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 220px;
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        padding: 8px;
+        display: none;
+        z-index: 1002;
+    }
+
+    .bookmark-search-dropdown.show {
+        display: block;
+        animation: popIn 0.2s ease;
+    }
+
+    .bookmark-search-dropdown input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 15px;
+        background-color: transparent;
+        color: var(--text);
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.25s ease;
+    }
+
+    .bookmark-search-dropdown input:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-soft);
+    }
+
+    .bookmark-search-dropdown input::placeholder {
+        color: var(--text-3);
+    }
+
+    /* ---------- 主要内容区 ---------- */
+    .content {
+        margin-top: 170px;
+        padding: 16px 10px 60px;
+        max-width: 1600px;
+        margin-left: auto;
+        margin-right: auto;
+        transition: opacity 0.3s ease;
+    }
+
+    .loading .content {
+        opacity: 0.6;
+    }
+
+    /* 管理控制按钮（管理员可见） */
+    .add-remove-controls {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        align-items: center;
+        gap: 14px;
+        z-index: 900;
+    }
+
+    .round-btn {
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition: all 0.25s ease;
+    }
+
+    .round-btn svg {
+        pointer-events: none;
+        display: block;
+        margin: auto;
+        width: 24px;
+        height: 24px;
+    }
+
+    .round-btn:hover {
+        transform: translateY(-3px) scale(1.06);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .round-btn:active {
+        transform: translateY(0) scale(0.95);
+    }
+
+    .add-btn { order: 1; }
+    .remove-btn { order: 2; }
+    .category-add-btn { order: 3; }
+    .category-manage-btn { order: 4; }
+
+    /* ---------- 分类与卡片 ---------- */
+    .section {
+        margin-bottom: 32px;
+        padding: 0 15px;
+    }
+
+    .section-title-container {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+        transition: border-color 0.3s ease;
+        width: 100%;
+        max-width: 1520px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        position: relative;
+        padding-left: 16px;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+        min-width: 120px;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 26px;
+        border-radius: 3px;
+        background: var(--brand-grad);
+        box-shadow: 0 0 10px var(--brand-soft);
+    }
+
+    /* 分类管理按钮 */
+    .edit-category-btn,
+    .move-category-btn {
+        background: var(--brand);
+        color: #fff;
+        border: none;
+        padding: 5px 12px;
+        margin-left: 8px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: none;
+    }
+
+    .edit-category-btn:hover {
+        filter: brightness(1.1);
+    }
+
+    .move-category-btn {
+        background: var(--accent);
+        padding: 5px 10px;
+        min-width: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .move-category-btn:hover {
+        filter: brightness(1.1);
+    }
+
+    .move-category-btn svg {
+        width: 16px;
+        height: 16px;
+        fill: #fff;
+    }
+
+    .delete-category-btn {
+        background: var(--danger);
+        color: #fff;
+        border: none;
+        padding: 5px 12px;
+        margin-left: 8px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: none;
+    }
+
+    .delete-category-btn:hover {
+        filter: brightness(1.1);
+    }
+
+    /* 卡片网格 */
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 156px);
+        column-gap: 22px;
+        row-gap: 18px;
+        justify-content: start;
+        padding: 10px 15px 10px 30px;
+        margin: 0 auto;
+        max-width: 1600px;
+    }
+
+    /* 卡片 */
+    .card {
+        position: relative;
+        width: 156px;
+        padding: 16px 14px 14px;
+        border-radius: var(--radius);
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-left: 4px solid var(--brand);
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        cursor: pointer;
+        user-select: none;
+        margin: 2px;
+        overflow: hidden;
+        animation: cardIn 0.45s ease forwards;
+        animation-delay: calc(var(--card-index) * 0.05s);
+        opacity: 0;
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background-color 0.28s ease;
+    }
+
+    /* 悬停光泽扫过 */
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -80%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.5s ease;
+        pointer-events: none;
+    }
+
+    .card:hover::after {
+        left: 140%;
+    }
+
+    .card:hover {
+        transform: translateY(-6px);
+        border-color: var(--brand);
+        box-shadow: var(--shadow-md);
+    }
+
+    @keyframes cardIn {
+        from { opacity: 0; transform: translateY(18px) scale(0.96); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card.dragging {
+        opacity: 0.85;
+        transform: scale(1.05) rotate(2deg);
+        box-shadow: var(--shadow-lg);
+        border-style: dashed;
+    }
+
+    .card.no-hover:hover {
+        transform: none !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    .card-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .card-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        object-fit: cover;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+    }
+
+    .card:hover .card-icon {
+        transform: scale(1.12) rotate(-3deg);
+    }
+
+    .card-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+        transition: color 0.3s ease;
+    }
+
+    .card-url {
+        font-size: 13px;
+        color: var(--text-3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
+    }
+
+    .private-tag {
+        background: var(--warn);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        position: absolute;
+        top: 14px;
+        right: 10px;
+        z-index: 5;
+    }
+
+    /* 卡片操作按钮 */
+    .card-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        z-index: 15;
+    }
+
+    .card-btn {
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 12px;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+        flex-shrink: 0;
+    }
+
+    .card-btn:hover {
+        transform: translateY(-2px) scale(1.08);
+        box-shadow: var(--shadow-md);
+        filter: brightness(1.1);
+    }
+
+    .card-btn svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        display: block;
+        margin: auto;
+    }
+
+    .edit-btn {
+        background: var(--brand);
+    }
+
+    .delete-btn {
+        background: var(--danger);
+    }
+
+    /* ---------- 浮动按钮组 ---------- */
+    .floating-button-group {
+        position: fixed;
+        bottom: 56px;
+        right: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        z-index: 1000;
+    }
+
+    .floating-button-group button {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition: all 0.25s ease;
+    }
+
+    .floating-button-group button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .floating-button-group button:active {
+        transform: scale(0.95);
+    }
+
+    #back-to-top-btn {
+        display: none;
+    }
+
+    #theme-toggle {
+        font-size: 24px;
+    }
+
+    /* ---------- 对话框 ---------- */
+    #dialog-overlay,
+    .dialog-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 14, 20, 0.45);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    #dialog-box,
+    .dialog-box {
+        width: min(420px, 92vw);
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        box-shadow: var(--shadow-lg);
+        animation: dialogIn 0.3s ease;
+    }
+
+    @keyframes dialogIn {
+        from { opacity: 0; transform: translateY(24px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #dialog-box label {
+        display: block;
+        margin: 4px 0 6px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-2);
+    }
+
+    #dialog-box input,
+    #dialog-box select,
+    .dialog-box input[type="text"] {
+        width: 100%;
+        margin-bottom: 14px;
+        padding: 11px 14px;
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        font-size: 15px;
+        background-color: transparent;
+        color: var(--text);
+        transition: all 0.25s ease;
+        box-sizing: border-box;
+    }
+
+    #dialog-box input:focus,
+    #dialog-box select:focus,
+    .dialog-box input[type="text"]:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--brand-soft);
+        outline: none;
+    }
+
+    .dialog-title {
+        margin: 0 0 14px;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .dialog-content {
+        padding: 8px 0 18px;
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--text);
+    }
+
+    .dialog-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .dialog-confirm-btn {
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .dialog-confirm-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .dialog-cancel-btn {
+        background: #eceff3;
+        color: var(--text-2);
+        border: none;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    body.dark-theme .dialog-cancel-btn {
+        background: #2c3442;
+        color: var(--text-2);
+    }
+
+    .dialog-cancel-btn:hover {
+        background: #dfe4ea;
+    }
+
+    body.dark-theme .dialog-cancel-btn:hover {
+        background: #38414f;
+    }
+
+    .top-z-index {
+        z-index: 9999;
+    }
+
+    /* ---------- 全屏登录弹窗 ---------- */
+    .login-modal-full {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            radial-gradient(800px 500px at 18% 12%, var(--bg-glow-1), transparent 60%),
+            radial-gradient(700px 500px at 85% 82%, var(--bg-glow-2), transparent 60%),
+            rgba(8, 12, 18, 0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        animation: fadeIn 0.35s ease;
+    }
+
+    .login-modal-content-full {
+        width: min(420px, 92vw);
+        box-sizing: border-box;
+        padding: 48px 40px;
+        text-align: center;
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: 26px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: dialogIn 0.35s ease;
+    }
+
+    .login-modal-content-full h3 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        background: var(--brand-grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
+
+    .login-modal-content-full input {
+        width: 100%;
+        max-width: 320px;
+        padding: 14px 18px;
+        margin: 24px 0;
+        border: 2px solid var(--line);
+        border-radius: 14px;
+        font-size: 17px;
+        text-align: center;
+        background: var(--panel);
+        color: var(--text);
+        box-sizing: border-box;
+        outline: none;
+        transition: all 0.25s ease;
+    }
+
+    .login-modal-content-full input:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 5px var(--brand-soft);
+    }
+
+    .login-modal-content-full input::placeholder {
+        color: var(--text-3);
+    }
+
+    .login-modal-buttons-full {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+    }
+
+    .login-modal-buttons-full button {
+        min-width: 120px;
+        padding: 13px 32px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        background: var(--brand-grad);
+        color: #fff;
+        box-shadow: 0 10px 24px var(--brand-soft);
+        transition: all 0.25s ease;
+    }
+
+    .login-modal-buttons-full button:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .login-modal-buttons-full button:active {
+        transform: scale(0.96);
+    }
+
+    /* ---------- 搜索结果 ---------- */
+    .search-results-section {
+        margin-bottom: 30px;
+    }
+
+    .search-results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 16px 20px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius);
+        border-left: 4px solid var(--brand);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .search-results-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .back-to-main {
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .back-to-main:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .no-search-results {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-3);
+        font-size: 17px;
+    }
+
+    /* ---------- 自定义提示框 ---------- */
+    #custom-tooltip {
+        position: absolute;
+        display: none;
+        z-index: 700;
+        background: rgba(20, 28, 40, 0.92);
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        pointer-events: none;
+        max-width: 320px;
+        white-space: pre-wrap;
+        box-shadow: var(--shadow-md);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+
+    /* ---------- 加载遮罩 ---------- */
+    #loading-mask {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 14, 20, 0.5);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 7000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loading-content {
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        padding: 26px 48px;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid var(--brand-soft);
+        border-top-color: var(--brand);
+        border-radius: 50%;
+        margin: 0 auto 14px;
+        animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ---------- 天气弹窗 ---------- */
+    .weather-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 14, 20, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .weather-modal.show {
+        display: flex;
+    }
+
+    .weather-modal-content {
+        width: min(400px, 92vw);
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: var(--shadow-lg);
+        animation: weatherModalIn 0.3s ease;
+    }
+
+    @keyframes weatherModalIn {
+        from { opacity: 0; transform: scale(0.92) translateY(-16px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .weather-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .weather-modal-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .weather-modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-3);
+        padding: 0;
+        line-height: 1;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .weather-modal-close:hover {
+        color: var(--brand);
+        transform: rotate(90deg);
+    }
+
+    .weather-search {
+        position: relative;
+        margin-bottom: 16px;
+    }
+
+    .weather-search input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        font-size: 15px;
+        outline: none;
+        background: var(--panel);
+        color: var(--text);
+        box-sizing: border-box;
+        transition: all 0.25s ease;
+    }
+
+    .weather-search input:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--brand-soft);
+    }
+
+    .weather-search input:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .weather-search-results {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius);
+        max-height: 220px;
+        overflow-y: auto;
+        display: none;
+        z-index: 10;
+        box-shadow: var(--shadow-md);
+    }
+
+    .weather-search-results.show {
+        display: block;
+        animation: popIn 0.2s ease;
+    }
+
+    .weather-search-item {
+        padding: 11px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--line);
+        transition: background-color 0.15s ease;
+    }
+
+    .weather-search-item:last-child {
+        border-bottom: none;
+    }
+
+    .weather-search-item:hover {
+        background: var(--brand-soft);
+    }
+
+    .weather-search-item-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+    }
+
+    .weather-search-item-path {
+        font-size: 13px;
+        color: var(--text-3);
+        margin-top: 2px;
+    }
+
+    .weather-mode-switch {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .weather-mode-btn {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-2);
+    }
+
+    .weather-mode-btn:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+
+    .weather-mode-btn.active {
+        background: var(--brand-grad);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 6px 16px var(--brand-soft);
+    }
+
+    .weather-current {
+        text-align: center;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 16px;
+    }
+
+    .weather-current-icon {
+        font-size: 52px;
+        margin-bottom: 6px;
+        animation: floatY 3s ease-in-out infinite;
+    }
+
+    .weather-current-temp {
+        font-size: 40px;
+        font-weight: 200;
+        color: var(--text);
+    }
+
+    .weather-current-desc {
+        font-size: 16px;
+        color: var(--text-2);
+        margin: 6px 0;
+    }
+
+    .weather-current-detail {
+        font-size: 13px;
+        color: var(--text-3);
+    }
+
+    @keyframes floatY {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-6px); }
+    }
+
+    .weather-forecast {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .weather-forecast-item {
+        flex: 1;
+        text-align: center;
+        padding: 14px 6px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius);
+        transition: all 0.25s ease;
+    }
+
+    .weather-forecast-item:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .weather-forecast-day {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-2);
+        margin-bottom: 6px;
+    }
+
+    .weather-forecast-icon {
+        font-size: 26px;
+        margin: 6px 0;
+    }
+
+    .weather-forecast-temp {
+        font-size: 13px;
+        color: var(--text-2);
+    }
+
+    .weather-forecast-temp .high {
+        color: #e2715c;
+        font-weight: 700;
+    }
+
+    .weather-forecast-temp .low {
+        color: #5c9ce6;
+        font-weight: 700;
+    }
+
+    .weather-not-configured {
+        text-align: center;
+        padding: 36px 16px;
+        color: var(--text-3);
+        font-size: 15px;
+    }
+
+    /* ---------- 通用动画 ---------- */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    @keyframes popIn {
+        from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ---------- 响应式（移动端） ---------- */
+    @media (max-width: 480px) {
+        .fixed-elements {
+            position: fixed;
+            height: auto;
+            min-height: 148px;
+            padding: 10px 10px 6px;
+            gap: 6px;
+        }
+
+        .fixed-elements h3 {
+            gap: 10px;
+            font-size: 20px;
+        }
+
+        .site-title .brand {
+            font-size: 20px;
+        }
+
+        .weather-mini {
+            font-size: 13px;
+            padding: 5px 12px;
+        }
+
+        .top-right-controls {
+            top: 10px;
+            right: 10px;
+            gap: 8px;
+        }
+
+        .admin-btn,
+        .login-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .bookmark-search-toggle {
+            width: 38px;
+            height: 38px;
+        }
+
+        .center-content {
+            padding: 0 4px;
+        }
+
+        .search-bar {
+            width: 94%;
+            max-width: 100%;
+            margin: 6px auto 8px;
+        }
+
+        .search-bar select {
+            width: 84px;
+            padding: 10px 26px 10px 14px;
+            font-size: 14px;
+        }
+
+        .search-bar input {
+            padding: 10px 14px;
+            font-size: 15px;
+        }
+
+        .search-bar button {
+            padding: 0 18px;
+        }
+
+        .category-buttons-container {
+            width: 100%;
+            max-width: none;
+            padding: 4px 2px 0;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            gap: 6px;
+            max-height: 36px;
+        }
+
+        .category-button {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .content {
+            margin-top: 152px;
+            margin-bottom: 90px;
+            padding: 12px;
+        }
+
+        .card-container {
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 14px;
+            row-gap: 12px;
+            padding: 10px;
+        }
+
+        .card {
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+        }
+
+        .card-url {
+            font-size: 12px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            min-width: 100px;
+        }
+
+        .section-title::before {
+            height: 22px;
+        }
+
+        .add-remove-controls {
+            right: 8px;
+            bottom: 120px;
+            top: auto;
+            transform: none;
+            gap: 12px;
+        }
+
+        .round-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .floating-button-group {
+            bottom: 24px;
+            right: 10px;
+            gap: 12px;
+        }
+
+        .floating-button-group button {
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+        }
+
+        #dialog-box,
+        .dialog-box {
+            width: 92%;
+            max-width: 360px;
+            padding: 22px;
+        }
+
+        .login-modal-content-full {
+            padding: 36px 24px;
+        }
+
+        .login-modal-content-full h3 {
+            font-size: 26px;
+        }
+    }
+
+    /* 降低动效偏好 */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部固定区域 -->
+    <div class="fixed-elements">
+        <!-- 站点标题 + 迷你天气 -->
+        <h3 class="site-title">
+            <span class="brand">CardTab</span>
+            <span class="weather-mini" id="weather-mini" onclick="openWeatherModal()"><span class="weather-loading">加载中...</span></span>
+        </h3>
+        <div class="center-content">
+            <!-- 搜索栏 -->
+            <div class="search-container">
+                <div class="search-bar">
+                    <select id="search-engine-select">
+                        <option value="baidu">百度</option>
+                        <option value="bing">必应</option>
+                    </select>
+                    <input type="text" id="search-input" placeholder="搜索你想要的…">
+                    <button id="search-button" title="搜索">🔍</button>
+                </div>
+            </div>
+            <div id="category-buttons-container" class="category-buttons-container"></div>
+        </div>
+        <!-- 右上角控制区 -->
+        <div class="top-right-controls">
+            <button class="admin-btn" id="admin-btn" onclick="toggleAdminMode()" style="display: none;">设置</button>
+            <button class="login-btn" id="login-btn" onclick="handleLoginClick()">登录</button>
+            <div class="bookmark-search-toggle" onclick="toggleBookmarkSearch()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                    <line x1="11" y1="8" x2="11" y2="14"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+                <div class="bookmark-search-dropdown" id="bookmark-search-dropdown">
+                    <input type="text" id="bookmark-search-input" placeholder="搜索书签...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- 管理控制按钮（管理员可见） -->
+        <div class="add-remove-controls">
+            <button class="round-btn add-btn" onclick="showAddDialog()" title="添加链接">
+                <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 6H8a2 2 0 0 0-2 2v8M16 42H8a2 2 0 0 1-2-2v-8M32 42h8a2 2 0 0 0 2-2v-8M32 6h8a2 2 0 0 1 2 2v8" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M32 24H16M24 16v16" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </button>
+
+            <button class="round-btn remove-btn" onclick="toggleRemoveMode()" title="编辑链接">
+                <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M42 26v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h14" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M14 26.72V34h7.32L42 13.31 34.7 6 14 26.72Z" stroke="white" stroke-width="4" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </button>
+
+            <button class="round-btn category-add-btn" onclick="addCategory()" title="添加分类">
+                <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 8c0-1.1.9-2 2-2h12l5 6h17c1.1 0 2 .9 2 2v26c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V8Z" stroke="white" stroke-width="4" stroke-linejoin="round" fill="none"/>
+                    <path d="M18 27h12M24 21v12" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+            </button>
+
+            <button class="round-btn category-manage-btn" onclick="toggleEditCategory()" title="编辑分类">
+                <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 8c0-1.1.9-2 2-2h12l5 6h17c1.1 0 2 .9 2 2v26c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V8Z" stroke="white" stroke-width="4" stroke-linejoin="round" fill="none"/>
+                    <circle cx="24" cy="28" r="4" stroke="white" stroke-width="4" fill="none"/>
+                    <path d="M24 21v3m0 8v3m4.8-12-2.1 2.1M20.8 31l-2.1 2.1M19 23l2.1 2.1M27 31l2.1 2.1M17 28h3M28 28h3" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 分类和卡片容器 -->
+        <div id="sections-container"></div>
+
+        <!-- 浮动按钮组 -->
+        <div class="floating-button-group">
+            <button id="back-to-top-btn" onclick="scrollToTop()" style="display: none;">
+                <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 24l12-12 12 12m-24 12 12-12 12 12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="theme-toggle" onclick="toggleTheme()" title="切换主题">◑</button>
+        </div>
+
+        <!-- 添加/编辑链接对话框 -->
+        <div id="dialog-overlay">
+            <div id="dialog-box">
+                <label for="name-input">名称</label>
+                <input type="text" id="name-input" placeholder="必填">
+                <label for="url-input">地址</label>
+                <input type="text" id="url-input" placeholder="必填">
+                <label for="tips-input">描述</label>
+                <input type="text" id="tips-input" placeholder="可选">
+                <label for="icon-input">图标</label>
+                <input type="text" id="icon-input" placeholder="可选">
+                <label for="category-select">选择分类</label>
+                <select id="category-select"></select>
+                <div class="private-link-container">
+                    <label for="private-checkbox">私密链接</label>
+                    <input type="checkbox" id="private-checkbox">
+                </div>
+                <div class="dialog-buttons">
+                    <button class="dialog-cancel-btn" id="dialog-cancel-btn">取消</button>
+                    <button class="dialog-confirm-btn" id="dialog-confirm-btn">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登录弹窗（全屏） -->
+        <div id="login-modal" class="login-modal-full">
+            <div class="login-modal-content-full">
+                <h3>登录</h3>
+                <input type="password" id="login-password" placeholder="请输入密码">
+                <div class="login-modal-buttons-full">
+                    <button onclick="performLogin()">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自定义 Alert 对话框 -->
+        <div class="dialog-overlay top-z-index" id="custom-alert-overlay" style="display: none;">
+            <div class="dialog-box" id="custom-alert-box">
+                <h3 class="dialog-title" id="custom-alert-title">提示</h3>
+                <div class="dialog-content" id="custom-alert-content">这里是提示内容</div>
+                <div class="dialog-buttons">
+                    <button class="dialog-confirm-btn" id="custom-alert-confirm">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自定义 Confirm 对话框 -->
+        <div class="dialog-overlay top-z-index" id="custom-confirm-overlay" style="display: none;">
+            <div class="dialog-box">
+                <div class="dialog-content" id="custom-confirm-message"></div>
+                <div class="dialog-buttons">
+                    <button id="custom-confirm-cancel" class="dialog-cancel-btn">取消</button>
+                    <button id="custom-confirm-ok" class="dialog-confirm-btn">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类名称输入对话框 -->
+        <div class="dialog-overlay" id="category-dialog" style="display: none;">
+            <div class="dialog-box">
+                <h3 id="category-dialog-title" class="dialog-title">新建分类</h3>
+                <input type="text" id="category-name-input" placeholder="请输入分类名称">
+                <div class="dialog-buttons">
+                    <button id="category-cancel-btn" class="dialog-cancel-btn">取消</button>
+                    <button id="category-confirm-btn" class="dialog-confirm-btn">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载遮罩 -->
+        <div id="loading-mask" style="display:none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>加载中，请稍候...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-tooltip"></div>
+
+    <script>
+    // 搜索引擎配置
+    const searchEngines = {
+        baidu: "https://www.baidu.com/s?wd=",
+        bing: "https://www.bing.com/search?q="
+    };
+
+    let currentEngine = "baidu";
+
+    // 日志记录函数
+    function logAction(action, details) {
+        const timestamp = new Date().toISOString();
+        const logEntry = timestamp + ': ' + action + ' - ' + JSON.stringify(details);
+        console.log(logEntry);
+    }
+
+    // 设置当前搜索引擎
+    function setActiveEngine(engine) {
+        currentEngine = engine;
+        document.getElementById('search-engine-select').value = engine;
+        logAction('设置搜索引擎', { engine });
+    }
+
+    // 搜索引擎选择框变更事件
+    document.getElementById('search-engine-select').addEventListener('change', function() {
+        setActiveEngine(this.value);
+    });
+
+    // 搜索按钮点击事件
+    document.getElementById('search-button').addEventListener('click', () => {
+        const query = document.getElementById('search-input').value;
+        if (query) {
+            logAction('执行搜索', { engine: currentEngine, query });
+            window.open(searchEngines[currentEngine] + encodeURIComponent(query), '_blank');
+        }
+    });
+
+    // 搜索输入框回车事件
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('search-button').click();
+        }
+    });
+
+    // 初始化搜索引擎
+    setActiveEngine(currentEngine);
+
+    // 全局变量
+    let publicLinks = [];
+    let privateLinks = [];
+    let isAdmin = false;
+    let isLoggedIn = false;
+    let removeMode = false;
+    let isEditCategoryMode = false;
+    let isDarkTheme = false;
+    let links = [];
+    const categories = {};
+
+    // 添加新分类
+    async function addCategory() {
+        if (!await validateToken()) {
+            return;
+        }
+        const categoryName = await showCategoryDialog('请输入新分类名称');
+        if (categoryName && !categories[categoryName]) {
+            categories[categoryName] = [];
+            updateCategorySelect();
+            renderSections();
+            saveLinks();
+            logAction('添加分类', { categoryName, currentLinkCount: links.length });
+        } else if (categories[categoryName]) {
+            await customAlert('该分类已存在', '添加分类');
+            logAction('添加分类失败', { categoryName, reason: '分类已存在' });
+        }
+    }
+
+    // 删除分类
+    async function deleteCategory(category) {
+        if (!await validateToken()) {
+            return;
+        }
+        const message = '确定要删除 "' + category + '" 分类吗？这将删除该分类下的所有链接。';
+        const confirmed = await customConfirm(message, '确定', '取消');
+
+        if (confirmed) {
+            delete categories[category];
+            links = links.filter(link => link.category !== category);
+            publicLinks = publicLinks.filter(link => link.category !== category);
+            privateLinks = privateLinks.filter(link => link.category !== category);
+            updateCategorySelect();
+            renderSections();
+            renderCategoryButtons();
+            saveLinks();
+            logAction('删除分类', { category });
+        }
+    }
+
+    // 编辑分类名称
+    async function editCategoryName(oldName) {
+        if (!await validateToken()) return;
+
+        const newName = await showCategoryDialog('请输入新的分类名称', oldName);
+        if (!newName || newName === oldName) return;
+
+        if (categories[newName]) {
+            await customAlert('该名称已存在，请重新命名', '编辑分类');
+            return;
+        }
+
+        // 1. 重命名分类对象
+        categories[newName] = categories[oldName];
+        delete categories[oldName];
+
+        // 2. 更新所有链接的 category 字段
+        [...publicLinks, ...privateLinks].forEach(link => {
+            if (link.category === oldName) {
+                link.category = newName;
+            }
+        });
+
+        links.forEach(link => {
+            if (link.category === oldName) {
+                link.category = newName;
+            }
+        });
+
+        // 3. 保存并刷新
+        renderSections();
+        renderCategoryButtons();
+        updateCategorySelect();
+        saveLinks();
+
+        logAction('编辑分类名称', { oldName, newName });
+    }
+
+    // 移动分类
+    async function moveCategory(categoryName, direction) {
+        if (!await validateToken()) {
+            return;
+        }
+        const keys = Object.keys(categories);
+        const index = keys.indexOf(categoryName);
+        if (index < 0) return;
+
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= keys.length) return;
+
+        // 重建一个新顺序的 categories 对象
+        const newCategories = {};
+        const reordered = [...keys];
+        [reordered[index], reordered[newIndex]] = [reordered[newIndex], reordered[index]];
+        reordered.forEach(key => {
+            newCategories[key] = categories[key];
+        });
+
+        // 替换原有 categories 并重渲染
+        Object.keys(categories).forEach(k => delete categories[k]);
+        Object.assign(categories, newCategories);
+
+        renderSections();
+        renderCategoryButtons();
+        updateCategorySelect();
+        saveLinks();
+
+        logAction('移动分类', { categoryName, direction });
+    }
+
+    // 切换分类编辑模式
+    function toggleEditCategory() {
+        isEditCategoryMode = !isEditCategoryMode;
+
+        const deleteButtons = document.querySelectorAll('.delete-category-btn');
+        const editButtons = document.querySelectorAll('.edit-category-btn');
+        const moveButtons = document.querySelectorAll('.move-category-btn');
+
+        deleteButtons.forEach(btn => {
+            btn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+        });
+
+        editButtons.forEach(btn => {
+            btn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+        });
+
+        moveButtons.forEach(btn => {
+            btn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+        });
+
+        // 更新分类管理按钮的样式以显示当前状态
+        const manageButton = document.querySelector('.category-manage-btn');
+        if (manageButton) {
+            if (isEditCategoryMode) {
+                manageButton.classList.add('active');
+            } else {
+                manageButton.classList.remove('active');
+            }
+        }
+
+        logAction('切换分类编辑模式', { isEditCategoryMode });
+    }
+
+    // 渲染分类快捷按钮
+    function renderCategoryButtons() {
+        // 如果正在显示搜索结果，不重新渲染分类按钮
+        if (isShowingSearchResults) {
+            return;
+        }
+
+        const buttonsContainer = document.getElementById('category-buttons-container');
+        buttonsContainer.innerHTML = '';
+
+        // 只有当有分类时才显示按钮容器
+        if (Object.keys(categories).length > 0) {
+            // 获取页面上实际显示的分类顺序（只从sections-container中获取，不包括搜索结果）
+            const displayedCategories = [];
+            document.querySelectorAll('#sections-container .section-title').forEach(titleElement => {
+                displayedCategories.push(titleElement.textContent);
+            });
+
+            // 创建按钮并添加到容器
+            let visibleButtonsCount = 0;
+            displayedCategories.forEach(category => {
+                // 检查该分类是否有可见的链接
+                const visibleLinks = links.filter(function(link) {
+                    return link.category === category && (!link.isPrivate || isLoggedIn);
+                });
+
+                // 只为有可见链接的分类创建按钮
+                if (visibleLinks.length > 0) {
+                    const button = document.createElement('button');
+                    button.className = 'category-button';
+                    button.textContent = category;
+                    button.dataset.category = category;
+                    button.onclick = () => {
+                        // 如果正在显示搜索结果，先隐藏搜索结果
+                        if (isShowingSearchResults) {
+                            hideSearchResults();
+                        }
+
+                        // 清除所有按钮的active类
+                        document.querySelectorAll('.category-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        // 为当前点击的按钮添加active类
+                        button.classList.add('active');
+                        scrollToCategory(category);
+                    };
+
+                    buttonsContainer.appendChild(button);
+                    visibleButtonsCount++;
+                }
+            });
+
+            // 显示或隐藏按钮容器
+            if (visibleButtonsCount > 0) {
+                buttonsContainer.style.display = 'flex';
+            } else {
+                buttonsContainer.style.display = 'none';
+            }
+
+            // 初始时检测当前可见分类并设置相应按钮为活跃状态
+            setTimeout(setActiveCategoryButtonByVisibility, 100);
+        } else {
+            buttonsContainer.style.display = 'none';
+        }
+    }
+
+    // 根据可见性设置活跃的分类按钮
+    function setActiveCategoryButtonByVisibility() {
+        // 如果正在显示搜索结果，不更新分类按钮的活跃状态
+        if (isShowingSearchResults) {
+            return;
+        }
+
+        // 获取所有分类区域
+        const sections = document.querySelectorAll('.section');
+        if (!sections.length) return;
+
+        // 获取视窗高度
+        const viewportHeight = window.innerHeight;
+        // 考虑固定元素的高度
+        const fixedElementsHeight = 170;
+        // 计算视窗中心点
+        const viewportCenter = viewportHeight / 2 + fixedElementsHeight;
+
+        // 找出最接近视窗中心的分类
+        let closestSection = null;
+        let closestDistance = Infinity;
+
+        sections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            // 计算分类区域的中心点
+            const sectionCenter = rect.top + rect.height / 2;
+            // 计算到视窗中心的距离
+            const distance = Math.abs(sectionCenter - viewportCenter);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestSection = section;
+            }
+        });
+
+        if (closestSection) {
+            const cardContainer = closestSection.querySelector('.card-container');
+            if (cardContainer && cardContainer.id) {
+                const categoryId = cardContainer.id;
+                const buttons = document.querySelectorAll('.category-button');
+
+                // 移除所有活跃状态
+                buttons.forEach(btn => btn.classList.remove('active'));
+
+                // 为匹配的分类按钮添加活跃状态
+                buttons.forEach(btn => {
+                    if (btn.dataset.category === categoryId) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+    }
+
+    // 添加滚动事件监听器，滚动时更新活跃的分类按钮
+    window.addEventListener('scroll', debounce(setActiveCategoryButtonByVisibility, 100));
+
+    // 防抖函数，避免过多的滚动事件处理
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
+
+    // 滚动到指定分类
+    function scrollToCategory(category) {
+        const section = document.getElementById(category);
+        if (section) {
+            // 计算滚动位置，考虑顶部固定元素的高度和额外偏移量
+            let offset = 230; // 减小偏移量，确保分类标题和第一行书签完全可见
+
+            // 检查是否为移动设备
+            if (window.innerWidth <= 480) {
+                offset = 120; // 移动设备上的偏移量
+            }
+
+            // 滚动到分类位置
+            const sectionRect = section.getBoundingClientRect();
+            const absoluteTop = window.pageYOffset + sectionRect.top - offset;
+
+            // 使用平滑滚动效果
+            window.scrollTo({
+                top: absoluteTop,
+                behavior: 'smooth'
+            });
+
+            logAction('滚动到分类', { category });
+        }
+    }
+
+    // 读取链接数据
+    async function loadLinks() {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        // 如果已登录，从 localStorage 获取 token 并添加到请求头
+        if (isLoggedIn) {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                headers['Authorization'] = token;
+            }
+        }
+
+        try {
+            const response = await fetch('/api/getLinks?userId=testUser', {
+                headers: headers
+            });
+
+            if (!response.ok) {
+                throw new Error("HTTP error! status: " + response.status);
+            }
+
+            const data = await response.json();
+
+            if (data.categories) {
+                Object.assign(categories, data.categories);
+            }
+
+            publicLinks = data.links ? data.links.filter(link => !link.isPrivate) : [];
+            privateLinks = data.links ? data.links.filter(link => link.isPrivate) : [];
+            links = isLoggedIn ? [...publicLinks, ...privateLinks] : publicLinks;
+
+            renderSections();
+            updateCategorySelect();
+            updateUIState();
+            logAction('读取链接', {
+                publicCount: publicLinks.length,
+                privateCount: privateLinks.length,
+                isLoggedIn: isLoggedIn,
+                hasToken: !!localStorage.getItem('authToken')
+            });
+        } catch (error) {
+            // 🔧 安全修复：避免泄露详细错误信息
+            console.error('Failed to load links');
+            console.error('加载链接时出错，请刷新页面重试');
+        }
+    }
+
+    // 更新UI状态
+    function updateUIState() {
+        const addRemoveControls = document.querySelector('.add-remove-controls');
+
+        if (isAdmin) {
+            addRemoveControls.style.display = 'flex';
+        } else {
+            addRemoveControls.style.display = 'none';
+        }
+
+        // 同时更新登录和设置按钮状态
+        updateLoginButton();
+
+        logAction('更新UI状态', { isAdmin, isLoggedIn });
+    }
+
+    // 渲染分类和链接
+    function renderSections() {
+        const container = document.getElementById('sections-container');
+        container.innerHTML = '';
+
+        Object.keys(categories).forEach(category => {
+            const section = document.createElement('div');
+            section.className = 'section';
+
+            const titleContainer = document.createElement('div');
+            titleContainer.className = 'section-title-container';
+
+            const title = document.createElement('div');
+            title.className = 'section-title';
+            title.textContent = category;
+
+            titleContainer.appendChild(title);
+
+            if (isAdmin) {
+                const editBtn = document.createElement('button');
+                editBtn.textContent = '编辑名称';
+                editBtn.className = 'edit-category-btn';
+                editBtn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+                editBtn.onclick = () => editCategoryName(category);
+                titleContainer.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '删除分类';
+                deleteBtn.className = 'delete-category-btn';
+                deleteBtn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+                deleteBtn.onclick = () => deleteCategory(category);
+                titleContainer.appendChild(deleteBtn);
+
+                const upBtn = document.createElement('button');
+                upBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 6l-6 6h4v6h4v-6h4z"/></svg>';
+                upBtn.className = 'move-category-btn';
+                upBtn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+                upBtn.onclick = () => moveCategory(category, -1);
+                titleContainer.appendChild(upBtn);
+
+                const downBtn = document.createElement('button');
+                downBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 18l6-6h-4v-6h-4v6h-4z"/></svg>';
+                downBtn.className = 'move-category-btn';
+                downBtn.style.display = isEditCategoryMode ? 'inline-block' : 'none';
+                downBtn.onclick = () => moveCategory(category, 1);
+                titleContainer.appendChild(downBtn);
+            }
+
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+            cardContainer.id = category;
+
+            section.appendChild(titleContainer);
+            section.appendChild(cardContainer);
+
+            let privateCount = 0;
+            let linkCount = 0;
+
+            links.forEach(link => {
+                if (link.category === category) {
+                    if (link.isPrivate) privateCount++;
+                    linkCount++;
+                    createCard(link, cardContainer);
+                }
+            });
+
+            if (privateCount < linkCount || isLoggedIn) {
+                container.appendChild(section);
+            }
+        });
+
+        // 渲染分类快捷按钮
+        renderCategoryButtons();
+
+        logAction('渲染分类和链接', { isAdmin: isAdmin, linkCount: links.length, categoryCount: Object.keys(categories).length });
+    }
+
+    // 从URL中提取域名
+    function extractDomain(url) {
+        let domain;
+        try {
+            domain = new URL(url).hostname;
+        } catch (e) {
+            domain = url;
+        }
+        return domain;
+    }
+
+    // URL验证函数
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    // URL规范化函数
+    function normalizeUrl(url) {
+        if (!url || typeof url !== 'string') {
+            return url;
+        }
+
+        // 去除首尾空格
+        url = url.trim();
+
+        // 补全协议（如果缺少）
+        if (!/^https?:\\/\\//i.test(url)) {
+            url = 'https://' + url;
+        }
+
+        try {
+            const parsed = new URL(url);
+
+            // 协议小写
+            let normalized = parsed.protocol.toLowerCase() + '//';
+
+            // 域名小写
+            normalized += parsed.hostname.toLowerCase();
+
+            // 移除默认端口（80 for http, 443 for https）
+            if (parsed.port &&
+                !((parsed.protocol === 'http:' && parsed.port === '80') ||
+                  (parsed.protocol === 'https:' && parsed.port === '443'))) {
+                normalized += ':' + parsed.port;
+            }
+
+            // 路径保留原样（服务器可能区分大小写）
+            // 但移除根路径的单斜杠
+            if (parsed.pathname && parsed.pathname !== '/') {
+                normalized += parsed.pathname;
+            }
+
+            // 保留查询参数
+            if (parsed.search) {
+                normalized += parsed.search;
+            }
+
+            // 不保留 fragment（#hash 部分）
+
+            return normalized;
+        } catch {
+            // URL 解析失败，返回小写处理后的原始值
+            return url.toLowerCase();
+        }
+    }
+
+    // 创建卡片
+    function createCard(link, container) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('draggable', isAdmin);
+        card.dataset.isPrivate = link.isPrivate;
+        card.setAttribute('data-url', link.url);
+
+        // 设置卡片动画延迟
+        const cardIndex = container.children.length;
+        card.style.setProperty('--card-index', cardIndex);
+
+        const cardTop = document.createElement('div');
+        cardTop.className = 'card-top';
+
+        // 定义默认的 SVG 图标
+        const defaultIconSVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>' +
+        '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>' +
+        '</svg>';
+
+        // 创建图标元素
+        const icon = document.createElement('img');
+        icon.className = 'card-icon';
+
+        // 使用自定义图标或回退到favicon提取服务
+        icon.src = (
+            !link.icon ||
+            typeof link.icon !== 'string' ||
+            !link.icon.trim() ||
+            !isValidUrl(link.icon)
+        )
+            ? 'https://www.faviconextractor.com/favicon/' + extractDomain(link.url)
+            : link.icon;
+
+        icon.alt = 'Website Icon';
+
+        // 如果图片加载失败，使用默认的 SVG 图标
+        icon.onerror = function() {
+            const svgBlob = new Blob([defaultIconSVG], {type: 'image/svg+xml'});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            this.src = svgUrl;
+
+            this.onload = () => URL.revokeObjectURL(svgUrl);
+        };
+
+        const title = document.createElement('div');
+        title.className = 'card-title';
+        title.textContent = link.name;
+
+        cardTop.appendChild(icon);
+        cardTop.appendChild(title);
+
+        const url = document.createElement('div');
+        url.className = 'card-url';
+        url.textContent = link.url;
+
+        card.appendChild(cardTop);
+        card.appendChild(url);
+
+        if (link.isPrivate) {
+            const privateTag = document.createElement('div');
+            privateTag.className = 'private-tag';
+            privateTag.textContent = '私密';
+            card.appendChild(privateTag);
+        }
+
+        const correctedUrl = link.url.startsWith('http://') || link.url.startsWith('https://') ? link.url : 'http://' + link.url;
+
+        if (!isAdmin) {
+            card.addEventListener('click', () => {
+                window.open(correctedUrl, '_blank');
+                logAction('打开链接', { name: link.name, url: correctedUrl });
+            });
+        }
+
+        // 创建按钮容器
+        const cardActions = document.createElement('div');
+        cardActions.className = 'card-actions';
+
+        // 编辑按钮
+        const editBtn = document.createElement('button');
+        editBtn.className = 'card-btn edit-btn';
+        editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>' +
+            '<path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>' +
+            '</svg>';
+        editBtn.title = '编辑';
+        editBtn.onclick = function (event) {
+            event.stopPropagation();
+            showEditDialog(link);
+        };
+
+        // 删除按钮
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'card-btn delete-btn';
+        deleteBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<polyline points="3,6 5,6 21,6"></polyline>' +
+            '<path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>' +
+            '<line x1="10" y1="11" x2="10" y2="17"></line>' +
+            '<line x1="14" y1="11" x2="14" y2="17"></line>' +
+            '</svg>';
+        deleteBtn.title = '删除';
+        deleteBtn.onclick = function (event) {
+            event.stopPropagation();
+            removeCard(card);
+        };
+
+        cardActions.appendChild(editBtn);
+        cardActions.appendChild(deleteBtn);
+        card.appendChild(cardActions);
+
+        // 添加鼠标悬停事件处理描述提示
+        card.addEventListener('mousemove', (e) => handleTooltipMouseMove(e, link.tips, isAdmin));
+        card.addEventListener('mouseleave', handleTooltipMouseLeave);
+
+        card.addEventListener('dragstart', dragStart);
+        card.addEventListener('dragover', dragOver);
+        card.addEventListener('dragend', dragEnd);
+        card.addEventListener('drop', drop);
+        card.addEventListener('touchstart', touchStart, { passive: false });
+
+        if (isAdmin && removeMode) {
+            editBtn.style.display = 'flex';
+            deleteBtn.style.display = 'flex';
+        }
+
+        if (isAdmin || (link.isPrivate && isLoggedIn) || !link.isPrivate) {
+            container.appendChild(card);
+        }
+
+    }
+
+    // 更新分类选择下拉框
+    function updateCategorySelect() {
+        const categorySelect = document.getElementById('category-select');
+        categorySelect.innerHTML = '';
+
+        Object.keys(categories).forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+
+        logAction('更新分类选择', { categoryCount: Object.keys(categories).length });
+    }
+
+    // 保存链接数据
+    async function saveLinks() {
+        if (isAdmin && !(await validateToken())) {
+            return;
+        }
+
+        let allLinks = [...publicLinks, ...privateLinks];
+
+        // 懒迁移：保存前规范化所有 URL
+        allLinks = allLinks.map(link => ({
+            ...link,
+            url: normalizeUrl(link.url)
+        }));
+
+        try {
+            await fetch('/api/saveOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('authToken')
+                },
+                body: JSON.stringify({
+                    userId: 'testUser',
+                    links: allLinks,
+                    categories: categories
+                }),
+            });
+            logAction('保存链接', { linkCount: allLinks.length, categoryCount: Object.keys(categories).length });
+        } catch (error) {
+            // 🔧 安全修复：避免泄露详细错误信息
+            logAction('保存链接失败', { error: 'Save operation failed' });
+            console.error('保存链接失败，请重试');
+        }
+    }
+
+    // 添加卡片弹窗
+    async function addLink() {
+        if (!await validateToken()) {
+            return;
+        }
+        const name = document.getElementById('name-input').value.trim();
+        const url = document.getElementById('url-input').value.trim();
+        const tips = document.getElementById('tips-input').value.trim();
+        const icon = document.getElementById('icon-input').value.trim();
+        const category = document.getElementById('category-select').value;
+        const isPrivate = document.getElementById('private-checkbox').checked;
+
+        // 验证必填字段
+        if (!name || !url || !category) {
+            let errorMessage = '';
+            if (!name && !url) {
+                errorMessage = '请输入名称和URL';
+            } else if (!name) {
+                errorMessage = '请输入名称';
+            } else if (!url) {
+                errorMessage = '请输入URL';
+            }
+
+            await customAlert(errorMessage, '添加卡片');
+            if (!name) {
+                document.getElementById('name-input').focus();
+            } else if (!url) {
+                document.getElementById('url-input').focus();
+            }
+            return;
+        }
+
+        // 规范化 URL 并检查是否已存在
+        const normalizedUrl = normalizeUrl(url);
+        const allLinks = [...publicLinks, ...privateLinks];
+        // 预处理：一次性规范化所有 URL（性能优化）
+        const existingUrls = new Set(allLinks.map(link => normalizeUrl(link.url)));
+
+        if (existingUrls.has(normalizedUrl)) {
+            await customAlert('该URL已存在，请勿重复添加', '添加卡片');
+            document.getElementById('url-input').focus();
+            return;
+        }
+
+        // 存储规范化后的 URL
+        const newLink = { name, url: normalizedUrl, tips, icon, category, isPrivate };
+
+        if (isPrivate) {
+            privateLinks.push(newLink);
+        } else {
+            publicLinks.push(newLink);
+        }
+
+        links = isLoggedIn ? [...publicLinks, ...privateLinks] : publicLinks;
+
+        if (isAdmin || (isPrivate && isLoggedIn) || !isPrivate) {
+            const container = document.getElementById(category);
+            if (container) {
+                createCard(newLink, container);
+            } else {
+                categories[category] = [];
+                renderSections();
+            }
+        }
+
+        saveLinks();
+
+        // 清空表单
+        document.getElementById('name-input').value = '';
+        document.getElementById('url-input').value = '';
+        document.getElementById('tips-input').value = '';
+        document.getElementById('icon-input').value = '';
+        document.getElementById('private-checkbox').checked = false;
+        hideAddDialog();
+
+        logAction('添加卡片', { name, url, tips, icon, category, isPrivate });
+    }
+
+    // 删除卡片
+    async function removeCard(card) {
+        if (!await validateToken()) {
+            return;
+        }
+        const name = card.querySelector('.card-title').textContent;
+        const url = card.getAttribute('data-url');
+        const isPrivate = card.dataset.isPrivate === 'true';
+
+        const confirmed = await customConfirm('确定要删除 "' + name + '" 吗？', '确定', '取消');
+        if (!confirmed) {
+            return;
+        }
+
+        links = links.filter(link => link.url !== url);
+        if (isPrivate) {
+            privateLinks = privateLinks.filter(link => link.url !== url);
+        } else {
+            publicLinks = publicLinks.filter(link => link.url !== url);
+        }
+
+        for (const key in categories) {
+            categories[key] = categories[key].filter(link => link.url !== url);
+        }
+
+        card.remove();
+
+        saveLinks();
+
+        logAction('删除卡片', { name, url, isPrivate });
+    }
+
+    // 拖拽卡片
+    let draggedCard = null;
+    let touchStartX, touchStartY;
+
+    // 触屏端拖拽卡片
+    function touchStart(event) {
+        if (!isAdmin) {
+            return;
+        }
+        draggedCard = event.target.closest('.card');
+        if (!draggedCard) return;
+
+        event.preventDefault();
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+
+        draggedCard.classList.add('dragging');
+
+        document.addEventListener('touchmove', touchMove, { passive: false });
+        document.addEventListener('touchend', touchEnd);
+
+    }
+
+    function touchMove(event) {
+        if (!draggedCard) return;
+        event.preventDefault();
+
+        const touch = event.touches[0];
+        const currentX = touch.clientX;
+        const currentY = touch.clientY;
+
+        const deltaX = currentX - touchStartX;
+        const deltaY = currentY - touchStartY;
+        draggedCard.style.transform = "translate(" + deltaX + "px, " + deltaY + "px)";
+
+        const target = findCardUnderTouch(currentX, currentY);
+        if (target && target !== draggedCard) {
+            const container = target.parentElement;
+            const targetRect = target.getBoundingClientRect();
+
+            if (currentX < targetRect.left + targetRect.width / 2) {
+                container.insertBefore(draggedCard, target);
+            } else {
+                container.insertBefore(draggedCard, target.nextSibling);
+            }
+        }
+    }
+
+    function touchEnd(event) {
+        if (!draggedCard) return;
+
+        const card = draggedCard;
+        const targetCategory = card.closest('.card-container').id;
+
+        // 🔧 优化：删除冗余验证，拖拽只在管理员模式下可用，saveCardOrder()内部已有验证
+        if (isAdmin && card) {
+            updateCardCategory(card, targetCategory);
+            saveCardOrder().catch(error => {
+                console.error('Save failed:', error);
+            });
+        }
+        cleanupDragState();
+    }
+
+    function findCardUnderTouch(x, y) {
+        const cards = document.querySelectorAll('.card:not(.dragging)');
+        return Array.from(cards).find(card => {
+            const rect = card.getBoundingClientRect();
+            return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        });
+    }
+
+    // PC端拖拽卡片
+    function dragStart(event) {
+        if (!isAdmin) {
+            event.preventDefault();
+            return;
+        }
+        draggedCard = event.target.closest('.card');
+        if (!draggedCard) return;
+
+        draggedCard.classList.add('dragging');
+        event.dataTransfer.effectAllowed = "move";
+        logAction('开始拖拽卡片', { name: draggedCard.querySelector('.card-title').textContent });
+    }
+
+    function dragOver(event) {
+        if (!isAdmin) {
+            event.preventDefault();
+            return;
+        }
+        event.preventDefault();
+        const target = event.target.closest('.card');
+        if (target && target !== draggedCard) {
+            const container = target.parentElement;
+            const mousePositionX = event.clientX;
+            const targetRect = target.getBoundingClientRect();
+
+            if (mousePositionX < targetRect.left + targetRect.width / 2) {
+                container.insertBefore(draggedCard, target);
+            } else {
+                container.insertBefore(draggedCard, target.nextSibling);
+            }
+        }
+    }
+
+    // 清理拖拽状态函数
+    function cleanupDragState() {
+        if (draggedCard) {
+            draggedCard.classList.remove('dragging');
+            draggedCard.style.transform = '';
+            draggedCard = null;
+        }
+
+        document.removeEventListener('touchmove', touchMove);
+        document.removeEventListener('touchend', touchEnd);
+
+        touchStartX = null;
+        touchStartY = null;
+    }
+
+    // PC端拖拽结束
+    function drop(event) {
+        if (!isAdmin) {
+            event.preventDefault();
+            return;
+        }
+        event.preventDefault();
+
+        const card = draggedCard;
+        const targetCategory = event.target.closest('.card-container').id;
+
+        validateToken().then(isValid => {
+            if (isValid && card) {
+                updateCardCategory(card, targetCategory);
+                saveCardOrder().catch(error => {
+                    console.error('Save failed:', error);
+                });
+            }
+            cleanupDragState();
+        });
+    }
+
+    function dragEnd(event) {
+        if (draggedCard) {
+            draggedCard.classList.remove('dragging');
+            logAction('拖拽卡片结束');
+        }
+    }
+
+    // 更新卡片分类
+    function updateCardCategory(card, newCategory) {
+        const cardTitle = card.querySelector('.card-title').textContent;
+        const cardUrl = card.getAttribute('data-url');
+        const isPrivate = card.dataset.isPrivate === 'true';
+
+        const linkIndex = links.findIndex(link => link.url === cardUrl);
+        if (linkIndex !== -1) {
+            links[linkIndex].category = newCategory;
+        }
+
+        const linkArray = isPrivate ? privateLinks : publicLinks;
+        const arrayIndex = linkArray.findIndex(link => link.url === cardUrl);
+        if (arrayIndex !== -1) {
+            linkArray[arrayIndex].category = newCategory;
+        }
+
+        card.dataset.category = newCategory;
+    }
+
+    // 在页面加载完成后添加触摸事件监听器
+    document.addEventListener('DOMContentLoaded', function() {
+        const cardContainers = document.querySelectorAll('.card-container');
+        cardContainers.forEach(container => {
+            container.addEventListener('touchstart', touchStart, { passive: false });
+        });
+    });
+
+    // 保存卡片顺序
+    async function saveCardOrder() {
+        if (!await validateToken()) {
+            return;
+        }
+        const containers = document.querySelectorAll('.card-container');
+        let newPublicLinks = [];
+        let newPrivateLinks = [];
+        let newCategories = {};
+
+        containers.forEach(container => {
+            const category = container.id;
+            newCategories[category] = [];
+
+            [...container.children].forEach(card => {
+                const url = card.getAttribute('data-url');
+                const name = card.querySelector('.card-title').textContent;
+                const isPrivate = card.dataset.isPrivate === 'true';
+                card.dataset.category = category;
+
+                // 从原始链接数据中获取描述和图标信息
+                const originalLink = links.find(link => link.url === url);
+                const tips = originalLink?.tips || '';
+                const icon = originalLink?.icon || '';
+
+                const link = { name, url, tips, icon, category, isPrivate };
+                if (isPrivate) {
+                    newPrivateLinks.push(link);
+                } else {
+                    newPublicLinks.push(link);
+                }
+                newCategories[category].push(link);
+            });
+        });
+
+        publicLinks.length = 0;
+        publicLinks.push(...newPublicLinks);
+        privateLinks.length = 0;
+        privateLinks.push(...newPrivateLinks);
+        Object.keys(categories).forEach(key => delete categories[key]);
+        Object.assign(categories, newCategories);
+
+        try {
+            const response = await fetch('/api/saveOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('authToken')
+                },
+                body: JSON.stringify({
+                    userId: 'testUser',
+                    links: [...newPublicLinks, ...newPrivateLinks],
+                    categories: newCategories
+                }),
+            });
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error('Failed to save order');
+            }
+            logAction('保存卡片顺序', { publicCount: newPublicLinks.length, privateCount: newPrivateLinks.length, categoryCount: Object.keys(newCategories).length });
+        } catch (error) {
+            logAction('保存顺序失败', { error: error.message });
+            await customAlert('保存顺序失败，请重试', '保存失败');
+        }
+    }
+
+    // 设置状态重新加载卡片
+    async function reloadCardsAsAdmin() {
+        document.querySelectorAll('.card-container').forEach(container => {
+            container.innerHTML = '';
+        });
+        await loadLinks();
+        logAction('重新加载卡片（管理员模式）');
+        hideLoginModal();
+    }
+
+    // 处理登录按钮点击
+    async function handleLoginClick() {
+        if (isLoggedIn) {
+            // 如果已登录，退出登录
+            const confirmed = await customConfirm('确定要退出登录吗？', '确定', '取消');
+            if (confirmed) {
+                await logout();
+            }
+        } else {
+            // 如果未登录，显示登录弹窗
+            showLoginModal();
+        }
+    }
+
+    // 显示登录弹窗
+    function showLoginModal() {
+        if(isLoggedIn){
+            hideLoginModal();
+            return;
+        }
+        document.getElementById('login-modal').style.display = 'flex';
+        document.getElementById('login-password').focus();
+    }
+
+    // 隐藏登录弹窗
+    function hideLoginModal() {
+        document.getElementById('login-modal').style.display = 'none';
+        document.getElementById('login-password').value = '';
+    }
+
+    // 执行登录
+    async function performLogin() {
+        const password = document.getElementById('login-password').value;
+        if (!password) {
+            await customAlert('请输入密码', '提示');
+            return;
+        }
+
+        try {
+            const result = await verifyPassword(password);
+            if (result.valid) {
+                isLoggedIn = true;
+                localStorage.setItem('authToken', result.token);
+                loadLinks();
+                hideLoginModal();
+                updateLoginButton();
+                await customAlert('登录成功！', '登录');
+                logAction('登录成功');
+            } else {
+                await customAlert('密码错误', '登录失败');
+                logAction('登录失败', { reason: result.error || '密码错误' });
+            }
+        } catch (error) {
+            // 🔧 安全修复：避免泄露详细错误信息
+            console.error('Login error occurred');
+            await customAlert('登录过程出错，请重试', '错误');
+        }
+    }
+
+    // 退出登录
+    async function logout() {
+        isLoggedIn = false;
+        isAdmin = false;
+        localStorage.removeItem('authToken');
+        links = publicLinks;
+        renderSections();
+        updateLoginButton();
+        await customAlert('退出登录成功！', '退出登录');
+        updateUIState();
+        logAction('退出登录');
+        showLoginModal();
+    }
+
+    // 更新按钮状态
+    function updateLoginButton() {
+        const loginBtn = document.getElementById('login-btn');
+        const adminBtn = document.getElementById('admin-btn');
+
+        if (isLoggedIn) {
+            loginBtn.textContent = '退出登录';
+            adminBtn.style.display = 'inline-block';
+            if (isAdmin) {
+                adminBtn.textContent = '离开设置';
+            } else {
+                adminBtn.textContent = '设置';
+            }
+        } else {
+            loginBtn.textContent = '登录';
+            adminBtn.style.display = 'none';
+            showLoginModal();
+        }
+    }
+
+    // 打开GitHub仓库
+    function openGitHub() {
+        window.open('https://github.com/hmhm2022/Card-Tab', '_blank');
+        logAction('访问GitHub仓库');
+    }
+
+    // 切换书签搜索下拉框
+    function toggleBookmarkSearch() {
+        const dropdown = document.getElementById('bookmark-search-dropdown');
+        const isVisible = dropdown.classList.contains('show');
+
+        if (isVisible) {
+            dropdown.classList.remove('show');
+        } else {
+            dropdown.classList.add('show');
+            document.getElementById('bookmark-search-input').focus();
+        }
+    }
+
+    // 点击页面其他地方关闭书签搜索下拉框
+    document.addEventListener('click', function(event) {
+        const searchToggle = document.querySelector('.bookmark-search-toggle');
+        const dropdown = document.getElementById('bookmark-search-dropdown');
+
+        if (!searchToggle.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // 登录密码输入框回车事件
+    document.getElementById('login-password').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performLogin();
+        }
+    });
+
+    // 切换设置状态
+    async function toggleAdminMode() {
+        const addRemoveControls = document.querySelector('.add-remove-controls');
+
+        if (!isAdmin && isLoggedIn) {
+            if (!await validateToken()) {
+                return;
+            }
+
+            // 显示加载状态
+            showLoading('正在进入设置模式...');
+
+            // 在进入设置模式之前进行备份
+            try {
+                const response = await fetch('/api/backupData', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': localStorage.getItem('authToken')
+                    },
+                    body: JSON.stringify({
+                        sourceUserId: 'testUser',
+                        backupUserId: 'backup'
+                    }),
+                });
+                const result = await response.json();
+                if (result.success) {
+                    logAction('数据备份成功');
+                } else {
+                    throw new Error('备份失败');
+                }
+            } catch (error) {
+                // 🔧 安全修复：避免泄露详细错误信息
+                logAction('数据备份失败', { error: 'Backup operation failed' });
+                hideLoading();
+                const confirmed = await customConfirm('备份失败，是否仍要继续进入设置模式？', '是', '否');
+                if (!confirmed) {
+                    return;
+                }
+                showLoading('正在进入设置模式...');
+            }
+
+            try {
+                isAdmin = true;
+                addRemoveControls.style.display = 'flex';
+                await reloadCardsAsAdmin();
+                logAction('进入设置');
+                hideLoading();
+                await customAlert('准备设置分类和书签', '设置模式');
+            } finally {
+                hideLoading();
+            }
+        } else if (isAdmin) {
+            isAdmin = false;
+            removeMode = false;
+            isEditCategoryMode = false;
+
+            // 重置分类管理按钮状态
+            const manageButton = document.querySelector('.category-manage-btn');
+            if (manageButton) {
+                manageButton.classList.remove('active');
+            }
+
+            addRemoveControls.style.display = 'none';
+            await reloadCardsAsAdmin();
+            logAction('离开设置');
+            await customAlert('设置已保存', '设置完成');
+        }
+
+        updateLoginButton();
+        updateUIState();
+    }
+
+    // 全局变量用于管理对话框事件处理器
+    let currentConfirmHandler = null;
+    let currentCancelHandler = null;
+
+    // 显示编辑链接对话框
+    function showEditDialog(link) {
+        document.getElementById('dialog-overlay').style.display = 'flex';
+
+        document.getElementById('name-input').value = link.name;
+        document.getElementById('url-input').value = link.url;
+        document.getElementById('tips-input').value = link.tips || '';
+        document.getElementById('icon-input').value = link.icon || '';
+        document.getElementById('category-select').value = link.category;
+        document.getElementById('private-checkbox').checked = link.isPrivate;
+
+        const confirmBtn = document.getElementById('dialog-confirm-btn');
+        const cancelBtn = document.getElementById('dialog-cancel-btn');
+
+        // 清除所有旧的事件处理器
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+        if (currentConfirmHandler) {
+            confirmBtn.removeEventListener('click', currentConfirmHandler);
+        }
+        if (currentCancelHandler) {
+            cancelBtn.removeEventListener('click', currentCancelHandler);
+        }
+
+        // 设置新的事件处理器
+        currentConfirmHandler = async function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            await updateLink(link);
+        };
+
+        currentCancelHandler = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            hideAddDialog();
+        };
+
+        confirmBtn.addEventListener('click', currentConfirmHandler);
+        cancelBtn.addEventListener('click', currentCancelHandler);
+
+        logAction('显示编辑链接对话框');
+    }
+
+    // 显示添加链接对话框
+    function showAddDialog() {
+        document.getElementById('dialog-overlay').style.display = 'flex';
+
+        const nameInput = document.getElementById('name-input');
+        nameInput.value = '';
+        document.getElementById('url-input').value = '';
+        document.getElementById('tips-input').value = '';
+        document.getElementById('icon-input').value = '';
+        document.getElementById('private-checkbox').checked = false;
+
+        const confirmBtn = document.getElementById('dialog-confirm-btn');
+        const cancelBtn = document.getElementById('dialog-cancel-btn');
+
+        // 清除所有旧的事件处理器
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+        if (currentConfirmHandler) {
+            confirmBtn.removeEventListener('click', currentConfirmHandler);
+        }
+        if (currentCancelHandler) {
+            cancelBtn.removeEventListener('click', currentCancelHandler);
+        }
+
+        // 设置新的事件处理器
+        currentConfirmHandler = async function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            await addLink();
+        };
+
+        currentCancelHandler = function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            hideAddDialog();
+        };
+
+        confirmBtn.addEventListener('click', currentConfirmHandler);
+        cancelBtn.addEventListener('click', currentCancelHandler);
+
+        setTimeout(() => {
+            nameInput.focus();
+        }, 50);
+
+        logAction('显示添加链接对话框');
+    }
+
+    // 更新链接
+    async function updateLink(oldLink) {
+        if (!await validateToken()) return;
+
+        const name = document.getElementById('name-input').value.trim();
+        const url = document.getElementById('url-input').value.trim();
+        const tips = document.getElementById('tips-input').value.trim();
+        const icon = document.getElementById('icon-input').value.trim();
+        const category = document.getElementById('category-select').value;
+        const isPrivate = document.getElementById('private-checkbox').checked;
+
+        // 验证必填字段
+        if (!name || !url || !category) {
+            let errorMessage = '';
+            if (!name && !url) {
+                errorMessage = '请输入名称和URL';
+            } else if (!name) {
+                errorMessage = '请输入名称';
+            } else if (!url) {
+                errorMessage = '请输入URL';
+            }
+
+            await customAlert(errorMessage, '编辑卡片');
+            if (!name) {
+                document.getElementById('name-input').focus();
+            } else if (!url) {
+                document.getElementById('url-input').focus();
+            }
+            return;
+        }
+
+        // 规范化 URL 并检查是否与其他链接重复（排除当前编辑的链接）
+        const normalizedUrl = normalizeUrl(url);
+        const normalizedOldUrl = normalizeUrl(oldLink.url);
+        const allLinks = [...publicLinks, ...privateLinks];
+
+        // 预处理：一次性规范化所有 URL（性能优化）
+        const normalizedUrls = allLinks.map(link => normalizeUrl(link.url));
+        const isUrlExists = normalizedUrls.some(nUrl =>
+            nUrl === normalizedUrl && nUrl !== normalizedOldUrl
+        );
+
+        if (isUrlExists) {
+            await customAlert('该URL已存在，请勿重复添加', '编辑卡片');
+            document.getElementById('url-input').focus();
+            return;
+        }
+
+        // 存储规范化后的 URL
+        const updatedLink = { name, url: normalizedUrl, tips, icon, category, isPrivate };
+
+        try {
+            // 替换旧链接
+            const list = oldLink.isPrivate ? privateLinks : publicLinks;
+            const listNormalizedUrls = list.map(l => normalizeUrl(l.url));
+            const index = listNormalizedUrls.indexOf(normalizedOldUrl);
+            if (index !== -1) {
+                list[index] = updatedLink;
+            }
+
+            // 同步更新 links
+            links = isLoggedIn ? [...publicLinks, ...privateLinks] : publicLinks;
+
+            await saveLinks();
+            renderSections();
+            hideAddDialog();
+
+            logAction('更新卡片', { oldUrl: oldLink.url, name, url, tips, icon, category, isPrivate });
+        } catch (error) {
+            logAction('更新卡片失败:', error);
+            await customAlert('更新卡片失败:' + error.message, '编辑卡片');
+        }
+    }
+
+    // 隐藏添加链接对话框
+    function hideAddDialog() {
+        document.getElementById('dialog-overlay').style.display = 'none';
+
+        // 清理事件处理器
+        const confirmBtn = document.getElementById('dialog-confirm-btn');
+        const cancelBtn = document.getElementById('dialog-cancel-btn');
+
+        if (currentConfirmHandler) {
+            confirmBtn.removeEventListener('click', currentConfirmHandler);
+            currentConfirmHandler = null;
+        }
+        if (currentCancelHandler) {
+            cancelBtn.removeEventListener('click', currentCancelHandler);
+            currentCancelHandler = null;
+        }
+
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+
+        logAction('隐藏添加链接对话框');
+    }
+
+    // 切换编辑卡片模式
+    function toggleRemoveMode() {
+        removeMode = !removeMode;
+        const editButtons = document.querySelectorAll('.edit-btn');
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+
+        editButtons.forEach(btn => {
+            btn.style.display = removeMode ? 'flex' : 'none';
+        });
+        deleteButtons.forEach(btn => {
+            btn.style.display = removeMode ? 'flex' : 'none';
+        });
+
+        // 隐藏自定义提示框
+        document.getElementById('custom-tooltip').style.display = 'none';
+
+        // 切换卡片悬停效果
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            if (removeMode) {
+                card.classList.add('no-hover');
+            } else {
+                card.classList.remove('no-hover');
+            }
+        });
+
+        logAction('切换编辑卡片模式', { removeMode });
+    }
+
+    // 切换主题
+    function toggleTheme() {
+        isDarkTheme = !isDarkTheme;
+
+        // 添加或移除暗色主题类
+        if (isDarkTheme) {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+
+        logAction('切换主题', { isDarkTheme });
+    }
+
+    // 返回顶部
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        logAction('返回顶部');
+    }
+
+    // 控制返回顶部按钮显示/隐藏
+    function handleBackToTopVisibility() {
+        const btn = document.getElementById('back-to-top-btn');
+        if (!btn) return;
+
+        // 如果页面滚动高度大于 300px，才显示按钮
+        if (window.scrollY > 300) {
+            btn.style.display = 'flex';
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
+    // 处理鼠标悬停提示
+    function handleTooltipMouseMove(e, tips, isAdmin) {
+        const tooltip = document.getElementById('custom-tooltip');
+
+        if (!tips || isAdmin) {
+            tooltip.style.display = 'none';
+            return;
+        }
+
+        // 设置提示内容
+        if (tooltip.textContent !== tips) {
+            tooltip.textContent = tips;
+        }
+
+        tooltip.style.display = 'block';
+
+        const offsetX = 15;
+        const offsetY = 10;
+
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const pageWidth = window.innerWidth;
+        const pageHeight = window.innerHeight;
+
+        let left = e.pageX + offsetX;
+        let top = e.pageY + offsetY;
+
+        if (pageWidth - e.clientX < 200) {
+            left = e.pageX - tooltipRect.width - offsetX;
+        }
+        // 如果距离底部小于100像素，往上显示
+        if (pageHeight - e.clientY < 100) {
+            top = e.pageY - tooltipRect.height - offsetY;
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function handleTooltipMouseLeave() {
+        const tooltip = document.getElementById('custom-tooltip');
+        tooltip.style.display = 'none';
+    }
+
+    // 验证密码
+    async function verifyPassword(inputPassword) {
+        const response = await fetch('/api/verifyPassword', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: inputPassword }),
+        });
+        const result = await response.json();
+        return result;
+    }
+
+    // 全局变量，标记是否正在显示搜索结果
+    let isShowingSearchResults = false;
+
+    // 书签搜索功能 - 简化版
+    function searchBookmarks(query) {
+        if (!query || query.trim() === '') {
+            hideSearchResults();
+            return;
+        }
+
+        query = query.toLowerCase().trim();
+        const sectionsContainer = document.getElementById('sections-container');
+
+        // 只搜索书签名称，简化搜索逻辑
+        const visibleLinks = links;
+        const matchedLinks = visibleLinks.filter(link =>
+            link.name.toLowerCase().includes(query)
+        );
+
+        // 清空主内容区域
+        sectionsContainer.innerHTML = '';
+
+        // 创建搜索结果头部
+        const searchHeader = document.createElement('div');
+        searchHeader.className = 'search-results-header';
+
+        const searchTitle = document.createElement('div');
+        searchTitle.className = 'search-results-title';
+        searchTitle.textContent = '搜索结果 (' + matchedLinks.length + '个)';
+
+        const backButton = document.createElement('button');
+        backButton.className = 'back-to-main';
+        backButton.textContent = '返回主页';
+        backButton.onclick = hideSearchResults;
+
+        searchHeader.appendChild(searchTitle);
+        searchHeader.appendChild(backButton);
+        sectionsContainer.appendChild(searchHeader);
+
+        if (matchedLinks.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'no-search-results';
+            noResults.textContent = '没有找到匹配的书签';
+            noResults.style.textAlign = 'center';
+            noResults.style.padding = '40px';
+            noResults.style.color = '#666';
+            sectionsContainer.appendChild(noResults);
+        } else {
+            // 创建简单的搜索结果容器
+            const resultsSection = document.createElement('div');
+            resultsSection.className = 'search-results-section';
+
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            // 为每个匹配的链接创建卡片
+            matchedLinks.forEach(link => {
+                createCard(link, cardContainer);
+            });
+
+            resultsSection.appendChild(cardContainer);
+            sectionsContainer.appendChild(resultsSection);
+        }
+
+        // 设置搜索状态标记
+        isShowingSearchResults = true;
+
+        // 隐藏分类按钮
+        const categoryButtonsContainer = document.getElementById('category-buttons-container');
+        if (categoryButtonsContainer) {
+            categoryButtonsContainer.style.display = 'none';
+        }
+
+        logAction('执行书签搜索', { query, resultCount: matchedLinks.length });
+    }
+
+    // 隐藏搜索结果 - 简化版
+    function hideSearchResults() {
+        // 重置标记
+        isShowingSearchResults = false;
+
+        // 清空搜索框
+        document.getElementById('bookmark-search-input').value = '';
+
+        // 重新渲染正常的分类和书签
+        renderSections();
+
+        // 显示分类按钮
+        const categoryButtonsContainer = document.getElementById('category-buttons-container');
+        if (categoryButtonsContainer) {
+            categoryButtonsContainer.style.display = 'flex';
+        }
+
+        // 重新渲染分类按钮，确保分类按钮的正确显示
+        renderCategoryButtons();
+    }
+
+    // 书签搜索输入框回车事件
+    document.getElementById('bookmark-search-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = document.getElementById('bookmark-search-input').value;
+            searchBookmarks(query);
+            // 搜索后关闭下拉框
+            document.getElementById('bookmark-search-dropdown').classList.remove('show');
+        }
+    });
+
+    // 书签搜索输入框实时搜索
+    document.getElementById('bookmark-search-input').addEventListener('input', (e) => {
+        const query = e.target.value;
+        if (query.trim() === '') {
+            hideSearchResults();
+        } else {
+            searchBookmarks(query);
+        }
+    });
+
+    // 初始化加载
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            await validateToken();
+            updateLoginButton();
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                isLoggedIn = false;
+                updateUIState();
+                showLoginModal();
+                return false;
+            }
+            hideLoginModal();
+            await loadLinks();
+            // 初始加载完成后，检测当前可见分类
+            setTimeout(setActiveCategoryButtonByVisibility, 500);
+            // 初始化返回顶部按钮状态
+            setTimeout(handleBackToTopVisibility, 100);
+        } catch (error) {
+            // 🔧 安全修复：避免泄露详细错误信息
+            console.error('Initialization failed');
+        }
+    });
+
+    // 添加滚动事件监听器
+    window.addEventListener('scroll', handleBackToTopVisibility);
+
+    // 前端检查是否有 token
+    async function validateToken() {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            isLoggedIn = false;
+            updateUIState();
+            return false;
+        }
+
+        try {
+            const response = await fetch('/api/getLinks?userId=testUser', {
+                headers: { 'Authorization': token }
+            });
+
+            if (response.status === 401) {
+                await resetToLoginState('登录时间已过期，请重新登录');
+                return false;
+            }
+
+            isLoggedIn = true;
+            updateUIState();
+            return true;
+        } catch (error) {
+            // 🔧 安全修复：避免泄露详细错误信息
+            console.error('Token validation failed');
+            return false;
+        }
+    }
+
+    // 重置状态
+    async function resetToLoginState(message) {
+        // 🔧 修复：显示用户可见的Token过期提示
+        if (message && message.trim() !== '') {
+            await customAlert(message, '登录状态');
+        }
+
+        cleanupDragState();
+
+        localStorage.removeItem('authToken');
+        isLoggedIn = false;
+        isAdmin = false;
+        removeMode = false;
+        isEditCategoryMode = false;
+
+        updateLoginButton();
+        updateUIState();
+        links = publicLinks;
+        renderSections();
+
+        const addRemoveControls = document.querySelector('.add-remove-controls');
+        if (addRemoveControls) {
+            addRemoveControls.style.display = 'none';
+        }
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.style.display = 'none';
+        });
+
+        document.querySelectorAll('.delete-category-btn').forEach(btn => {
+            btn.style.display = 'none';
+        });
+
+        document.querySelectorAll('.edit-category-btn').forEach(btn => {
+            btn.style.display = 'none';
+        });
+
+        document.querySelectorAll('.move-category-btn').forEach(btn => {
+            btn.style.display = 'none';
+        });
+
+        // 重置分类管理按钮状态
+        const manageButton = document.querySelector('.category-manage-btn');
+        if (manageButton) {
+            manageButton.classList.remove('active');
+        }
+
+        const dialogOverlay = document.getElementById('dialog-overlay');
+        if (dialogOverlay) {
+            dialogOverlay.style.display = 'none';
+        }
+
+        const loginModal = document.getElementById('login-modal');
+        if (loginModal) {
+            loginModal.style.display = 'none';
+        }
+
+        // 确保按钮状态正确重置
+        const adminBtn = document.getElementById('admin-btn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
+    }
+
+    // 自定义Alert对话框
+    function customAlert(message, title = '提示', confirmText = '确定') {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('custom-alert-overlay');
+            const titleEl = document.getElementById('custom-alert-title');
+            const contentEl = document.getElementById('custom-alert-content');
+            const confirmBtn = document.getElementById('custom-alert-confirm');
+
+            // 设置内容
+            titleEl.textContent = title;
+            contentEl.textContent = message;
+            confirmBtn.textContent = confirmText;
+
+            // 显示弹窗
+            overlay.style.display = 'flex';
+
+            // 确认按钮事件
+            const handleConfirm = () => {
+                overlay.style.display = 'none';
+                confirmBtn.removeEventListener('click', handleConfirm);
+                document.removeEventListener('keydown', handleKeyDown);
+                resolve();
+            };
+
+            confirmBtn.addEventListener('click', handleConfirm);
+
+            // ESC键关闭
+            const handleKeyDown = (e) => {
+                if (e.key === 'Escape') {
+                    handleConfirm();
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+
+            // 点击遮罩层关闭
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    handleConfirm();
+                }
+            });
+        });
+    }
+
+    // 自定义Confirm对话框
+    function customConfirm(message, okText = '确定', cancelText = '取消') {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('custom-confirm-overlay');
+            const messageEl = document.getElementById('custom-confirm-message');
+            const okBtn = document.getElementById('custom-confirm-ok');
+            const cancelBtn = document.getElementById('custom-confirm-cancel');
+
+            // 设置弹窗内容
+            messageEl.textContent = message;
+            okBtn.textContent = okText;
+            cancelBtn.textContent = cancelText;
+
+            // 显示弹窗
+            overlay.style.display = 'flex';
+
+            // 事件处理函数
+            const handleConfirm = (result) => {
+                cleanup();
+                resolve(result);
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') handleConfirm(true);
+                if (e.key === 'Escape') handleConfirm(false);
+            };
+
+            // 清理函数
+            const cleanup = () => {
+                overlay.style.display = 'none';
+                document.removeEventListener('keydown', handleKeyDown);
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+                overlay.onclick = null;
+            };
+
+            // 绑定事件
+            okBtn.onclick = () => handleConfirm(true);
+            cancelBtn.onclick = () => handleConfirm(false);
+            document.addEventListener('keydown', handleKeyDown);
+            overlay.onclick = (e) => e.target === overlay && handleConfirm(false);
+        });
+    }
+
+    // 分类名称输入对话框
+    function showCategoryDialog(title, defaultValue = '') {
+        return new Promise((resolve) => {
+            const dialog = document.getElementById('category-dialog');
+            const input = document.getElementById('category-name-input');
+            const titleEl = document.getElementById('category-dialog-title');
+            const confirmBtn = document.getElementById('category-confirm-btn');
+            const cancelBtn = document.getElementById('category-cancel-btn');
+
+            // 设置弹窗内容
+            titleEl.textContent = title;
+            input.value = defaultValue;
+
+            // 显示弹窗
+            dialog.style.display = 'flex';
+            setTimeout(() => input.focus(), 50);
+
+            // 事件处理函数
+            const handleConfirm = () => {
+                const value = input.value.trim();
+                if (value) {
+                    cleanup();
+                    resolve(value);
+                } else {
+                    input.focus();
+                }
+            };
+
+            const handleCancel = () => {
+                cleanup();
+                resolve(null);
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirm();
+                } else if (e.key === 'Escape') {
+                    handleCancel();
+                }
+            };
+
+            // 清理函数
+            const cleanup = () => {
+                dialog.style.display = 'none';
+                document.removeEventListener('keydown', handleKeyDown);
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+                dialog.onclick = null;
+            };
+
+            // 绑定事件
+            confirmBtn.onclick = handleConfirm;
+            cancelBtn.onclick = handleCancel;
+            document.addEventListener('keydown', handleKeyDown);
+            dialog.onclick = (e) => e.target === dialog && handleCancel();
+        });
+    }
+
+    // 显示加载遮罩
+    function showLoading(message = '加载中，请稍候...') {
+        const mask = document.getElementById('loading-mask');
+        const textElement = mask.querySelector('p');
+        textElement.textContent = message;
+        mask.style.display = 'flex';
+    }
+
+    // 隐藏加载遮罩
+    function hideLoading() {
+        const mask = document.getElementById('loading-mask');
+        mask.style.display = 'none';
+    }
+
+    // ========== 天气组件 ==========
+    const WEATHER_API = '/api/weather';  // 后端代理
+    const WEATHER_CACHE_KEY = 'card_tab_weather_cache';
+    const WEATHER_CACHE_DURATION = 30 * 60 * 1000; // 30分钟
+    const WEATHER_MODE_KEY = 'card_tab_weather_mode'; // 定位模式：ip 或 fixed
+    const WEATHER_FIXED_CITY_KEY = 'card_tab_weather_fixed_city'; // 默认城市信息
+    let weatherNotConfigured = false; // 天气服务是否未配置
+
+    // 天气图标映射
+    const WEATHER_ICONS = {
+        '100': '☀️', '150': '🌙', '101': '⛅', '102': '⛅', '103': '🌥️', '104': '☁️',
+        '151': '🌙', '152': '🌙', '153': '🌙', '154': '☁️',
+        '300': '🌦️', '301': '🌧️', '302': '⛈️', '303': '⛈️', '304': '⛈️',
+        '305': '🌧️', '306': '🌧️', '307': '🌧️', '308': '🌧️', '309': '🌧️',
+        '310': '🌧️', '311': '🌧️', '312': '🌧️', '313': '🌧️',
+        '400': '🌨️', '401': '🌨️', '402': '🌨️', '403': '🌨️', '404': '🌨️',
+        '500': '🌫️', '501': '🌫️', '502': '🌫️', '503': '🌫️', '504': '🌫️',
+        '999': '❓'
+    };
+    const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+    let currentWeatherLocation = null;
+    let weatherSearchTimer = null;
+
+    // 获取定位模式
+    function getWeatherMode() {
+        return localStorage.getItem(WEATHER_MODE_KEY) || 'ip';
+    }
+
+    // 设置定位模式
+    function setWeatherMode(mode) {
+        localStorage.setItem(WEATHER_MODE_KEY, mode);
+        updateWeatherModeUI();
+    }
+
+    // 获取默认城市
+    function getFixedCity() {
+        try {
+            const data = localStorage.getItem(WEATHER_FIXED_CITY_KEY);
+            return data ? JSON.parse(data) : null;
+        } catch (e) { return null; }
+    }
+
+    // 设置默认城市
+    function setFixedCity(location) {
+        localStorage.setItem(WEATHER_FIXED_CITY_KEY, JSON.stringify(location));
+    }
+
+    // 更新模式切换UI
+    function updateWeatherModeUI() {
+        const mode = getWeatherMode();
+        const ipBtn = document.getElementById('weather-mode-ip');
+        const fixedBtn = document.getElementById('weather-mode-fixed');
+        if (ipBtn && fixedBtn) {
+            ipBtn.classList.toggle('active', mode === 'ip');
+            fixedBtn.classList.toggle('active', mode === 'fixed');
+        }
+    }
+
+    // 切换到IP定位模式
+    async function switchToIPMode() {
+        setWeatherMode('ip');
+        localStorage.removeItem(WEATHER_CACHE_KEY);
+        document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">定位中...</span>';
+        await loadWeatherByIP();
+    }
+
+    // 初始化天气
+    async function initWeather() {
+        updateWeatherModeUI();
+        const mode = getWeatherMode();
+
+        // 如果是默认城市模式，优先使用默认城市
+        if (mode === 'fixed') {
+            const fixedCity = getFixedCity();
+            if (fixedCity) {
+                // 检查缓存是否有效
+                const cache = getWeatherCache();
+                if (cache && cache.location && cache.location.id === fixedCity.id && cache.now && cache.forecast) {
+                    currentWeatherLocation = cache.location;
+                    renderWeatherMini(cache.now, cache.location);
+                    renderWeatherModal(cache.now, cache.forecast, cache.location);
+                    return;
+                }
+                // 缓存无效，使用默认城市重新加载天气
+                currentWeatherLocation = fixedCity;
+                await loadWeatherData();
+                return;
+            }
+        }
+
+        // IP定位模式或没有设置默认城市
+        const cache = getWeatherCache();
+        if (cache && cache.location && cache.now && cache.forecast) {
+            currentWeatherLocation = cache.location;
+            renderWeatherMini(cache.now, cache.location);
+            renderWeatherModal(cache.now, cache.forecast, cache.location);
+            return;
+        }
+        await loadWeatherByIP();
+    }
+
+    // 获取缓存
+    function getWeatherCache() {
+        try {
+            const data = localStorage.getItem(WEATHER_CACHE_KEY);
+            if (!data) return null;
+            const cache = JSON.parse(data);
+            if (Date.now() - cache.timestamp > WEATHER_CACHE_DURATION) return null;
+            return cache;
+        } catch (e) { return null; }
+    }
+
+    // 设置缓存
+    function setWeatherCache(location, now, forecast) {
+        localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
+            location: location, now: now, forecast: forecast, timestamp: Date.now()
+        }));
+    }
+
+    // IP定位加载天气
+    async function loadWeatherByIP() {
+        try {
+            const ipRes = await fetch('https://ipapi.co/json/');
+            if (!ipRes.ok) throw new Error('IP定位失败');
+            const ipData = await ipRes.json();
+            const cityName = ipData.city || ipData.region;
+
+            const geoRes = await fetch(WEATHER_API + '/geo?location=' + encodeURIComponent(cityName) + '&number=1');
+
+            // 检查是否未配置天气服务
+            if (geoRes.status === 503) {
+                weatherNotConfigured = true;
+                renderWeatherNotConfigured(cityName);
+                return;
+            }
+
+            const geoData = await geoRes.json();
+            if (geoData.code !== '200' || !geoData.location || !geoData.location.length) throw new Error('城市查询失败');
+
+            currentWeatherLocation = geoData.location[0];
+            await loadWeatherData();
+        } catch (e) {
+            console.error('天气加载失败详细错误:', e);
+            document.getElementById('weather-mini').innerHTML = '<span class="weather-loading" title="' + e.message + '">加载失败</span>';
+        }
+    }
+
+    // 加载天气数据
+    async function loadWeatherData() {
+        if (!currentWeatherLocation) return;
+        try {
+            const [nowRes, forecastRes] = await Promise.all([
+                fetch(WEATHER_API + '/now?location=' + currentWeatherLocation.id),
+                fetch(WEATHER_API + '/3d?location=' + currentWeatherLocation.id)
+            ]);
+
+            // 检查是否未配置天气服务
+            if (nowRes.status === 503 || forecastRes.status === 503) {
+                weatherNotConfigured = true;
+                renderWeatherNotConfigured(currentWeatherLocation.name);
+                return;
+            }
+
+            const nowData = await nowRes.json();
+            const forecastData = await forecastRes.json();
+
+            if (nowData.code !== '200' || forecastData.code !== '200') throw new Error('天气API错误');
+
+            setWeatherCache(currentWeatherLocation, nowData.now, forecastData.daily);
+            renderWeatherMini(nowData.now, currentWeatherLocation);
+            renderWeatherModal(nowData.now, forecastData.daily, currentWeatherLocation);
+        } catch (e) {
+            console.warn('天气数据加载失败:', e);
+        }
+    }
+
+    // 渲染未配置天气服务的状态
+    function renderWeatherNotConfigured(cityName) {
+        // 迷你天气：城市 + --°
+        document.getElementById('weather-mini').innerHTML =
+            '<span class="weather-city">' + (cityName || '--') + '</span>' +
+            '<span class="weather-temp">--°</span>';
+        // 弹窗内容
+        document.getElementById('weather-current').innerHTML =
+            '<div class="weather-not-configured">未配置天气 Api Key</div>';
+        // 禁用搜索框
+        const searchInput = document.getElementById('weather-city-input');
+        if (searchInput) {
+            searchInput.disabled = true;
+            searchInput.placeholder = '天气服务未启用';
+        }
+    }
+
+    // 渲染迷你天气
+    function renderWeatherMini(now, location) {
+        const icon = WEATHER_ICONS[now.icon] || '❓';
+        document.getElementById('weather-mini').innerHTML =
+            '<span class="weather-city">' + location.name + '</span>' +
+            '<span class="weather-icon">' + icon + '</span>' +
+            '<span class="weather-temp">' + now.temp + '°</span>';
+    }
+
+    // 渲染天气弹窗
+    function renderWeatherModal(now, forecast, location) {
+        const icon = WEATHER_ICONS[now.icon] || '❓';
+        document.getElementById('weather-current').innerHTML =
+            '<div class="weather-current-icon">' + icon + '</div>' +
+            '<div class="weather-current-temp">' + now.temp + '°C</div>' +
+            '<div class="weather-current-desc">' + location.name + ' · ' + now.text + '</div>' +
+            '<div class="weather-current-detail">体感' + now.feelsLike + '° 湿度' + now.humidity + '% ' + now.windDir + now.windScale + '级</div>';
+
+        let forecastHtml = '';
+        forecast.slice(0, 3).forEach(function(day, i) {
+            var date = new Date(day.fxDate);
+            var dayName = i === 0 ? '今天' : WEEKDAYS[date.getDay()];
+            var dayIcon = WEATHER_ICONS[day.iconDay] || '❓';
+            forecastHtml += '<div class="weather-forecast-item">' +
+                '<div class="weather-forecast-day">' + dayName + '</div>' +
+                '<div class="weather-forecast-icon">' + dayIcon + '</div>' +
+                '<div class="weather-forecast-temp"><span class="low">' + day.tempMin + '°</span>~<span class="high">' + day.tempMax + '°</span></div>' +
+            '</div>';
+        });
+        document.getElementById('weather-forecast').innerHTML = forecastHtml;
+    }
+
+    // 弹窗控制
+    function openWeatherModal() {
+        document.getElementById('weather-modal').classList.add('show');
+    }
+    function closeWeatherModal() {
+        document.getElementById('weather-modal').classList.remove('show');
+        document.getElementById('weather-search-results').classList.remove('show');
+        document.getElementById('weather-city-input').value = '';
+    }
+    function closeWeatherModalOutside(e) {
+        if (e.target.id === 'weather-modal') closeWeatherModal();
+    }
+
+    // 城市搜索
+    async function searchWeatherCity(query) {
+        if (weatherNotConfigured) return; // 未配置时禁用搜索
+        if (weatherSearchTimer) clearTimeout(weatherSearchTimer);
+        const resultsEl = document.getElementById('weather-search-results');
+        if (query.length < 1) { resultsEl.classList.remove('show'); return; }
+
+        weatherSearchTimer = setTimeout(async function() {
+            try {
+                const res = await fetch(WEATHER_API + '/geo?location=' + encodeURIComponent(query) + '&number=8');
+                const data = await res.json();
+                if (data.code !== '200' || !data.location || !data.location.length) {
+                    resultsEl.innerHTML = '<div class="weather-search-item"><div class="weather-search-item-name">未找到城市</div></div>';
+                } else {
+                    resultsEl.innerHTML = data.location.map(function(loc) {
+                        return '<div class="weather-search-item" data-loc-id="' + loc.id + '" data-loc-name="' + loc.name + '" data-loc-adm1="' + loc.adm1 + '" data-loc-adm2="' + loc.adm2 + '">' +
+                        '<div class="weather-search-item-name">' + loc.name + '</div>' +
+                        '<div class="weather-search-item-path">' + loc.adm1 + ' · ' + loc.adm2 + '</div></div>';
+                    }).join('');
+                    // 为搜索结果添加点击事件
+                    resultsEl.querySelectorAll('.weather-search-item').forEach(function(item) {
+                        item.onclick = function() {
+                            selectWeatherCity(
+                                item.getAttribute('data-loc-id'),
+                                item.getAttribute('data-loc-name'),
+                                item.getAttribute('data-loc-adm1'),
+                                item.getAttribute('data-loc-adm2')
+                            );
+                        };
+                    });
+                }
+                resultsEl.classList.add('show');
+            } catch (e) { resultsEl.innerHTML = '<div class="weather-search-item"><div class="weather-search-item-name">搜索失败</div></div>'; resultsEl.classList.add('show'); }
+        }, 300);
+    }
+
+    // 选择城市
+    async function selectWeatherCity(id, name, adm1, adm2) {
+        currentWeatherLocation = { id: id, name: name, adm1: adm1, adm2: adm2 };
+        document.getElementById('weather-search-results').classList.remove('show');
+        document.getElementById('weather-city-input').value = '';
+        document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">加载中...</span>';
+        // 保存为默认城市并切换模式
+        setFixedCity(currentWeatherLocation);
+        setWeatherMode('fixed');
+        localStorage.removeItem(WEATHER_CACHE_KEY);
+        await loadWeatherData();
+    }
+
+    // 页面加载时初始化天气
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            initWeather().catch(function(err) {
+                console.error('天气初始化失败:', err);
+                document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">加载失败</span>';
+            });
+        }, 500); // 延迟加载，优先加载主内容       
+    }); 
+
+    </script>
+    <!-- 天气弹窗 -->
+    <div class="weather-modal" id="weather-modal" onclick="closeWeatherModalOutside(event)">
+        <div class="weather-modal-content" onclick="event.stopPropagation()">
+            <div class="weather-modal-header">
+                <span class="weather-modal-title">天气详情</span>
+                <button class="weather-modal-close" onclick="closeWeatherModal()">&times;</button>
+            </div>
+            <div class="weather-search">
+                <input type="text" id="weather-city-input" placeholder="🔍 搜索城市..." oninput="searchWeatherCity(this.value)">
+                <div class="weather-search-results" id="weather-search-results"></div>
+            </div>
+            <div class="weather-mode-switch">
+                <button class="weather-mode-btn" id="weather-mode-ip" onclick="switchToIPMode()">🌐 IP自动定位</button>
+                <button class="weather-mode-btn" id="weather-mode-fixed">📍 默认城市</button>
+            </div>
+            <div class="weather-current" id="weather-current">
+                <div class="weather-current-icon">--</div>
+                <div class="weather-current-temp">--°C</div>
+                <div class="weather-current-desc">--</div>
+                <div class="weather-current-detail">体感--° 湿度--% --</div>
+            </div>
+            <div class="weather-forecast" id="weather-forecast">
+                <div class="weather-forecast-item"><div class="weather-forecast-day">--</div><div class="weather-forecast-icon">--</div><div class="weather-forecast-temp">--</div></div>
+                <div class="weather-forecast-item"><div class="weather-forecast-day">--</div><div class="weather-forecast-icon">--</div><div class="weather-forecast-temp">--</div></div>
+                <div class="weather-forecast-item"><div class="weather-forecast-day">--</div><div class="weather-forecast-icon">--</div><div class="weather-forecast-temp">--</div></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+`;
+
+// 常量时间比较函数，防止时序攻击
+function constantTimeCompare(a, b) {
+    if (a.length !== b.length) return false;
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+        result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return result === 0;
+}
+
+// 服务端 token 验证
+async function validateServerToken(authToken, env) {
+    if (!authToken) {        
+        return {
+            isValid: false,
+            status: 401,
+            response: { error: 'Unauthorized', message: '未登录或登录已过期' }
+        };
+    }
+
+    try {
+        const parts = authToken.split('.');
+        let timestamp, expiryMinutes, hash;
+
+        // 兼容新旧两种 token 格式
+        if (parts.length === 3) {
+            // 新格式：timestamp.expiryMinutes.hash
+            [timestamp, expiryMinutes, hash] = parts;
+            expiryMinutes = parseInt(expiryMinutes);
+            if (isNaN(expiryMinutes)) {
+                throw new Error('Invalid expiry format');
+            }
+        } else if (parts.length === 2) {
+            // 旧格式：timestamp.hash（向后兼容，使用默认30分钟）
+            [timestamp, hash] = parts;
+            const envExpiry = parseInt(env.TOKEN_EXPIRY_MINUTES);
+            expiryMinutes = isNaN(envExpiry) ? 30 : envExpiry;
+        } else {
+            throw new Error('Invalid token format');
+        }
+
+        const tokenTimestamp = parseInt(timestamp);
+        const now = Date.now();
+
+        // 计算过期时间：-1 表示永久有效
+        if (expiryMinutes !== -1) {
+            const expiryMs = expiryMinutes * 60 * 1000;
+            if (now - tokenTimestamp > expiryMs) {
+                return {
+                    isValid: false,
+                    status: 401,
+                    response: {
+                        error: 'Token expired',
+                        tokenExpired: true,
+                        message: '登录已过期，请重新登录'
+                    }
+                };
+            }
+        }
+
+        // 根据 token 格式构建验证数据
+        const tokenData = parts.length === 3
+            ? timestamp + "_" + expiryMinutes + "_" + env.ADMIN_PASSWORD
+            : timestamp + "_" + env.ADMIN_PASSWORD;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(tokenData);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const expectedHash = btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+
+        // 使用常量时间比较防止时序攻击
+        if (!constantTimeCompare(hash, expectedHash)) {
+            return {
+                isValid: false,
+                status: 401,
+                response: {
+                    error: 'Invalid token',
+                    tokenInvalid: true,
+                    message: '登录状态无效，请重新登录'
+                }
+            };
+        }
+
+        return { isValid: true };
+    } catch (error) {
+        // 避免泄露详细错误信息
+        return {
+            isValid: false,
+            status: 401,
+            response: {
+                error: 'Invalid token',
+                tokenInvalid: true,
+                message: '登录验证失败，请重新登录'
+            }
+        };
+    }
+}
+
+// 管理员权限验证函数
+async function validateAdminToken(authToken, env) {
+    const validation = await validateServerToken(authToken, env);
+    if (!validation.isValid) {
+        return validation;
+    }
+
+    // Token有效，确认管理员权限
+    return {
+        isValid: true,
+        isAdmin: true
+    };
+}
+
+export default {
+    async fetch(request, env) {
+      const url = new URL(request.url);
+
+      if (url.pathname === '/') {
+        return new Response(HTML_CONTENT, {
+          headers: { 'Content-Type': 'text/html' }
+        });
+      }
+
+      // ========== 天气代理 API ==========
+      const normalizeBaseUrl = (raw) => {
+        const value = (raw || '').trim();
+        if (!value) return null;
+        const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+        return withScheme.replace(/\/+$/, '');
+      };
+
+      // 公告说明：公共 API 域名将逐步停服，建议改用你的 API Host（形如：xxx.yyy.qweatherapi.com）
+      // - devapi.qweather.com 已于 2026-01-01 停止服务
+      // - GeoAPI 使用 API Host 时需从 /v2/... 变更为 /geo/v2/...
+      const qweatherHost = normalizeBaseUrl(env.WEATHER_API_HOST);
+      const qweatherApiBase = qweatherHost || 'https://api.qweather.com';
+      const qweatherGeoBase = qweatherHost ? `${qweatherApiBase}/geo` : 'https://geoapi.qweather.com';
+
+      const proxyQWeatherJson = async (targetUrl) => {
+        const redactedUrl = targetUrl.replace(/([?&]key=)[^&]*/i, '$1***');
+        let res;
+        try {
+          res = await fetch(targetUrl);
+        } catch (err) {
+          return new Response(JSON.stringify({
+            code: '502',
+            error: 'qweather_fetch_failed',
+            upstreamUrl: redactedUrl,
+            message: String(err)
+          }), { status: 502, headers: { 'Content-Type': 'application/json' } });
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+        const text = await res.text();
+
+        if (!res.ok) {
+          return new Response(JSON.stringify({
+            code: String(res.status),
+            error: 'qweather_upstream_error',
+            upstreamStatus: res.status,
+            upstreamContentType: contentType,
+            upstreamUrl: redactedUrl,
+            upstreamBody: (text || '').slice(0, 800)
+          }), { status: 502, headers: { 'Content-Type': 'application/json' } });
+        }
+
+        try {
+          if (!text) throw new Error('empty response body');
+          const data = JSON.parse(text);
+          return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+        } catch (err) {
+          return new Response(JSON.stringify({
+            code: '502',
+            error: 'qweather_invalid_json',
+            upstreamContentType: contentType,
+            upstreamUrl: redactedUrl,
+            upstreamBody: (text || '').slice(0, 800),
+            message: String(err)
+          }), { status: 502, headers: { 'Content-Type': 'application/json' } });
+        }
+      };
+
+      if (url.pathname === '/api/weather/now') {
+        if (!env.WEATHER_API_KEY) {
+          return new Response(JSON.stringify({ code: '503', error: 'weather_not_configured' }), {
+            status: 503, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        const location = url.searchParams.get('location');
+        if (!location) {
+          return new Response(JSON.stringify({ code: '400', error: 'missing location' }), {
+            status: 400, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        return await proxyQWeatherJson(
+          `${qweatherApiBase}/v7/weather/now?location=${encodeURIComponent(location)}&key=${env.WEATHER_API_KEY}`
+        );
+      }
+
+      if (url.pathname === '/api/weather/3d') {
+        if (!env.WEATHER_API_KEY) {
+          return new Response(JSON.stringify({ code: '503', error: 'weather_not_configured' }), {
+            status: 503, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        const location = url.searchParams.get('location');
+        if (!location) {
+          return new Response(JSON.stringify({ code: '400', error: 'missing location' }), {
+            status: 400, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        return await proxyQWeatherJson(
+          `${qweatherApiBase}/v7/weather/3d?location=${encodeURIComponent(location)}&key=${env.WEATHER_API_KEY}`
+        );
+      }
+
+      if (url.pathname === '/api/weather/geo') {
+        if (!env.WEATHER_API_KEY) {
+          return new Response(JSON.stringify({ code: '503', error: 'weather_not_configured' }), {
+            status: 503, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        const location = url.searchParams.get('location');
+        const number = url.searchParams.get('number') || '8';
+        if (!location) {
+          return new Response(JSON.stringify({ code: '400', error: 'missing location' }), {
+            status: 400, headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        return await proxyQWeatherJson(
+          `${qweatherGeoBase}/v2/city/lookup?location=${encodeURIComponent(location)}&key=${env.WEATHER_API_KEY}&number=${number}`
+        );
+      }
+
+      if (url.pathname === '/api/getLinks') {
+        const userId = url.searchParams.get('userId');
+        const authToken = request.headers.get('Authorization');
+        const data = await env.CARD_ORDER.get(userId);
+
+        if (data) {
+            const parsedData = JSON.parse(data);
+
+            // 验证 token
+            if (authToken) {
+                const validation = await validateServerToken(authToken, env);
+                if (!validation.isValid) {
+                    return new Response(JSON.stringify(validation.response), {
+                        status: validation.status,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+
+                // Token 有效，返回完整数据
+                return new Response(JSON.stringify(parsedData), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+
+            // 未提供 token，只返回公开数据
+            const filteredLinks = parsedData.links.filter(link => !link.isPrivate);
+            const filteredCategories = {};
+            Object.keys(parsedData.categories).forEach(category => {
+                filteredCategories[category] = parsedData.categories[category].filter(link => !link.isPrivate);
+            });
+
+            return new Response(JSON.stringify({
+                links: filteredLinks,
+                categories: filteredCategories
+            }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        return new Response(JSON.stringify({
+            links: [],
+            categories: {}
+        }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (url.pathname === '/api/saveOrder' && request.method === 'POST') {
+        const authToken = request.headers.get('Authorization');
+        const validation = await validateServerToken(authToken, env);
+
+        if (!validation.isValid) {
+            return new Response(JSON.stringify(validation.response), {
+                status: validation.status,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        const { userId, links, categories } = await request.json();
+        await env.CARD_ORDER.put(userId, JSON.stringify({ links, categories }));
+        return new Response(JSON.stringify({
+            success: true,
+            message: '保存成功'
+        }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (url.pathname === '/api/verifyPassword' && request.method === 'POST') {
+        try {
+            const body = await request.json();
+            const { password, expiryMinutes: clientExpiry } = body;
+            const isValid = password === env.ADMIN_PASSWORD;
+
+            if (isValid) {
+                // 允许的有效期白名单（分钟）：15分钟、1小时、1天、7天、30天、永久
+                const ALLOWED_EXPIRY_VALUES = [15, 60, 1440, 10080, 43200, -1];
+                const defaultExpiry = parseInt(env.TOKEN_EXPIRY_MINUTES) || 30;
+
+                // 验证客户端传入的有效期是否在白名单中
+                let expiryMinutes = defaultExpiry;
+                if (typeof clientExpiry === 'number' && Number.isInteger(clientExpiry) && ALLOWED_EXPIRY_VALUES.includes(clientExpiry)) {
+                    expiryMinutes = clientExpiry;
+                }
+
+                // 生成包含时间戳和有效期的加密 token
+                const timestamp = Date.now();
+                const tokenData = timestamp + "_" + expiryMinutes + "_" + env.ADMIN_PASSWORD;
+                const encoder = new TextEncoder();
+                const data = encoder.encode(tokenData);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+                // 使用指定格式：timestamp.expiryMinutes.hash
+                const token = timestamp + "." + expiryMinutes + "." + btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+
+                return new Response(JSON.stringify({
+                    valid: true,
+                    token: token,
+                    expiryMinutes: expiryMinutes
+                }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+
+            return new Response(JSON.stringify({
+                valid: false,
+                error: 'Invalid password'
+            }), {
+                status: 403,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (error) {
+            return new Response(JSON.stringify({
+                valid: false,
+                error: error.message
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+      }
+
+      if (url.pathname === '/api/backupData' && request.method === 'POST') {
+        // 🔧 安全修复：添加管理员权限验证
+        const authToken = request.headers.get('Authorization');
+        const validation = await validateAdminToken(authToken, env);
+
+        if (!validation.isValid) {
+            return new Response(JSON.stringify(validation.response), {
+                status: validation.status,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        try {
+            const { sourceUserId } = await request.json();
+            const result = await this.backupData(env, sourceUserId);
+            return new Response(JSON.stringify(result), {
+              status: result.success ? 200 : 404,
+              headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (error) {
+            // 避免泄露详细错误信息
+            return new Response(JSON.stringify({
+                success: false,
+                message: '备份操作失败'
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+      }
+
+      return new Response('Not Found', { status: 404 });
+    },
+
+    async backupData(env, sourceUserId) {
+        const MAX_BACKUPS = 10;
+        const sourceData = await env.CARD_ORDER.get(sourceUserId);
+
+        if (sourceData) {
+            try {
+                const currentDate = new Date().toLocaleString('zh-CN', {
+                    timeZone: 'Asia/Shanghai',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).replace(/\//g, '-');
+
+                const backupId = `backup_${currentDate}`;
+
+                const backups = await env.CARD_ORDER.list({ prefix: 'backup_' });
+                const backupKeys = backups.keys.map(key => key.name).sort((a, b) => {
+                    const timeA = new Date(a.split('_')[1].replace(/-/g, '/')).getTime();
+                    const timeB = new Date(b.split('_')[1].replace(/-/g, '/')).getTime();
+                    return timeB - timeA;  // 降序排序，最新的在前
+                });
+
+                await env.CARD_ORDER.put(backupId, sourceData);
+
+                const allBackups = [...backupKeys, backupId].sort((a, b) => {
+                    const timeA = new Date(a.split('_')[1].replace(/-/g, '/')).getTime();
+                    const timeB = new Date(b.split('_')[1].replace(/-/g, '/')).getTime();
+                    return timeB - timeA;
+                });
+
+                const backupsToDelete = allBackups.slice(MAX_BACKUPS);
+
+                if (backupsToDelete.length > 0) {
+                    await Promise.all(
+                        backupsToDelete.map(key => env.CARD_ORDER.delete(key))
+                    );
+                }
+
+                return {
+                    success: true,
+                    backupId,
+                    remainingBackups: MAX_BACKUPS,
+                    deletedCount: backupsToDelete.length
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: 'Backup operation failed',
+                    details: error.message
+                };
+            }
+        }
+        return { success: false, error: 'Source data not found' };
+    }
+  };
