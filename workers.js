@@ -7,627 +7,479 @@ const HTML_CONTENT = `
     <title>CardTab</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>⭐</text></svg>">
     <style>
-    /* 全局样式 */
+    /* ============================================================
+       CardTab 主题 —— 美化版
+       设计基调：柔和玻璃拟态 + 呼吸感光斑背景 + 渐变品牌色
+       字体整体放大，保证舒适阅读；暗色/亮色通过 CSS 变量切换
+       ============================================================ */
+
+    /* ---------- 设计变量 ---------- */
     body {
-        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        --bg: #f2f6f3;
+        --bg-glow-1: rgba(67, 184, 131, 0.18);
+        --bg-glow-2: rgba(93, 127, 185, 0.16);
+        --bg-glow-3: rgba(255, 190, 120, 0.14);
+        --panel: rgba(255, 255, 255, 0.72);
+        --panel-solid: #ffffff;
+        --panel-border: rgba(255, 255, 255, 0.7);
+        --line: rgba(31, 41, 55, 0.09);
+        --text: #26334a;
+        --text-2: #5d6b7e;
+        --text-3: #8b96a6;
+        --brand: #2fae7d;
+        --brand-deep: #279a6b;
+        --brand-soft: rgba(47, 174, 125, 0.15);
+        --brand-grad: linear-gradient(135deg, #38c98c 0%, #2fae7d 55%, #28a39a 100%);
+        --accent: #5d7fb9;
+        --accent-soft: rgba(93, 127, 185, 0.15);
+        --danger: #e74c3c;
+        --warn: #ff9800;
+        --shadow-sm: 0 2px 10px rgba(31, 45, 61, 0.06);
+        --shadow-md: 0 10px 30px rgba(31, 45, 61, 0.11);
+        --shadow-lg: 0 18px 50px rgba(31, 45, 61, 0.17);
+        --radius-sm: 10px;
+        --radius: 14px;
+        --radius-lg: 20px;
+        --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color-scheme: light;
+    }
+
+    body.dark-theme {
+        --bg: #0d1117;
+        --bg-glow-1: rgba(67, 184, 131, 0.10);
+        --bg-glow-2: rgba(93, 127, 185, 0.13);
+        --bg-glow-3: rgba(124, 92, 186, 0.11);
+        --panel: rgba(24, 29, 40, 0.78);
+        --panel-solid: #1a2029;
+        --panel-border: rgba(255, 255, 255, 0.09);
+        --line: rgba(255, 255, 255, 0.08);
+        --text: #e7ecf4;
+        --text-2: #9fb0c3;
+        --text-3: #6c7a8d;
+        --brand: #5d7fb9;
+        --brand-deep: #4a6fa5;
+        --brand-soft: rgba(93, 127, 185, 0.16);
+        --brand-grad: linear-gradient(135deg, #7298d6 0%, #5d7fb9 55%, #4a6fa5 100%);
+        --accent: #43b883;
+        --accent-soft: rgba(67, 184, 131, 0.15);
+        --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.28);
+        --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.38);
+        --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5);
+        color-scheme: dark;
+    }
+
+    /* ---------- 基础与呼吸感背景 ---------- */
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        min-height: 100%;
+    }
+
+    body {
         margin: 0;
         padding: 0;
-        background-color: #f8f6f2; /* 米白色背景 */
-        color: #222; /* 深灰字体 */
-        transition: all 0.3s ease;
+        font-family: var(--font);
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--text);
+        background-color: var(--bg);
+        background-image:
+            radial-gradient(1100px 700px at 88% -12%, var(--bg-glow-2), transparent 60%),
+            radial-gradient(950px 650px at -12% 22%, var(--bg-glow-1), transparent 55%),
+            radial-gradient(900px 700px at 50% 125%, var(--bg-glow-3), transparent 60%);
+        background-attachment: fixed;
+        transition: background-color 0.4s ease, color 0.4s ease;
+        -webkit-font-smoothing: antialiased;
     }
 
-    /* 暗色模式样式 */
-    body.dark-theme {
-        background-color: #121418; /* 更深的背景色 */
-        color: #e3e3e3;
+    /* 缓慢漂移的装饰光斑，赋予页面生命力 */
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        z-index: -1;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        pointer-events: none;
+        will-change: transform;
     }
 
-    /* 固定元素样式 */
+    body::before {
+        width: 520px;
+        height: 520px;
+        top: -140px;
+        left: -120px;
+        background: var(--bg-glow-1);
+        animation: aurora-a 26s ease-in-out infinite alternate;
+    }
+
+    body::after {
+        width: 620px;
+        height: 620px;
+        right: -160px;
+        bottom: -160px;
+        background: var(--bg-glow-2);
+        animation: aurora-b 32s ease-in-out infinite alternate;
+    }
+
+    @keyframes aurora-a {
+        0%   { transform: translate(0, 0) scale(1); }
+        50%  { transform: translate(80px, 60px) scale(1.15); }
+        100% { transform: translate(20px, 120px) scale(0.95); }
+    }
+
+    @keyframes aurora-b {
+        0%   { transform: translate(0, 0) scale(1); }
+        50%  { transform: translate(-90px, -50px) scale(1.1); }
+        100% { transform: translate(-30px, -100px) scale(1.22); }
+    }
+
+    ::selection {
+        background: var(--brand-soft);
+        color: var(--text);
+    }
+
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--brand);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--brand-deep);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+
+    /* ---------- 顶部固定区域 ---------- */
     .fixed-elements {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        background-color: #f8f6f2; /* 与整体背景一致 */
         z-index: 1000;
-        padding: 10px;
-        transition: all 0.3s ease;
-        height: 150px;
-        box-shadow: none; /* 移除阴影 */
+        min-height: 158px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 64px 8px;
+        background: var(--panel);
+        backdrop-filter: blur(18px) saturate(1.4);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
+        border-bottom: 1px solid var(--panel-border);
+        box-shadow: var(--shadow-sm);
+        transition: background-color 0.4s ease;
     }
 
-    body.dark-theme .fixed-elements {
-        background-color: #121418; /* 与暗色主题背景完全一致 */
-        box-shadow: none; /* 移除阴影 */
-    }
-
-    /* 分类快捷按钮容器样式移至搜索栏内 */
-
-    .category-button {
-        padding: 5px 10px;
-        border-radius: 15px;
-        background-color: #f9fafb;
-        color: #43b883;
-        border: none;
-        cursor: pointer;
-        font-size: 17px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        flex: 0 0 auto;
-        white-space: nowrap;
-        margin: 0 2px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    body.dark-theme .category-button {
-        background-color: #2a2e38;
-        color: #5d7fb9;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .category-button:hover {
-        background-color: #43b883;
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12);
-    }
-
-    /* 分类按钮选中效果 */
-    .category-button.active {
-        background-color: #43b883;
-        color: white;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
-        transform: translateY(-1px);
-        font-weight: 600;
-        border-bottom: 2px solid #35a674;
-    }
-
-    body.dark-theme .category-button:hover,
-    body.dark-theme .category-button.active {
-        background-color: #5d7fb9;
-        color: white;
-    }
-
-    /* 分类按钮悬停样式 */
-
+    /* 站点标题 */
     .fixed-elements h3 {
-        position: absolute;
-        top: 10px;
-        left: 20px;
         margin: 0;
-        font-size: 22px;
-        font-weight: 600;
-        color: #222;
-        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--text);
         z-index: 10;
     }
 
-    body.dark-theme .fixed-elements h3 {
-        color: #e3e3e3;
+    .site-title .brand {
+        display: inline-flex;
+        align-items: center;
+        font-size: 26px;
     }
 
-    /* 一言模块样式 */
-    #hitokoto {
-        margin: 5px 0 15px;
-        font-size: 14px;
-        color: #888;
-        font-style: italic;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        transition: all 0.3s ease;
+    .site-title .brand::before {
+        content: '';
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--brand-grad);
+        margin-right: 10px;
+        animation: brandPulse 3s ease-in-out infinite;
     }
 
-    #hitokoto a {
-        color: #43b883;
-        text-decoration: none;
-        transition: all 0.3s ease;
+    @keyframes brandPulse {
+        0%, 100% { box-shadow: 0 0 6px var(--brand); }
+        50%      { box-shadow: 0 0 18px var(--brand); }
     }
 
-    #hitokoto a:hover {
-        color: #35a674;
-    }
-
-    body.dark-theme #hitokoto {
-        color: #a0a0a0;
-    }
-
-    body.dark-theme #hitokoto a {
-        color: #5d7fb9;
-    }
-
-    /* 中心内容样式 */
+    /* 中心内容 */
     .center-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         width: 100%;
-        max-width: none; /* 不限制最大宽度，使分类按钮有更多空间 */
         text-align: center;
-        padding: 0 10px; /* 添加左右内边距 */
+        padding: 0 10px;
     }
 
-    /* 右上角控制区域样式 */
+    /* 搜索栏 */
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .search-bar {
+        display: flex;
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto 12px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: var(--panel);
+        border: 1.5px solid var(--panel-border);
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--brand-soft), var(--shadow-md);
+        transform: translateY(-1px);
+    }
+
+    .search-bar select {
+        border: none;
+        background-color: transparent;
+        padding: 12px 34px 12px 18px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--brand);
+        width: 128px;
+        outline: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%232fae7d" d="M0 0l6 6 6-6z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        border-right: 1px solid var(--line);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    body.dark-theme .search-bar select {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%235d7fb9" d="M0 0l6 6 6-6z"/></svg>');
+    }
+
+    .search-bar input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        padding: 12px 18px;
+        font-size: 16px;
+        background-color: transparent;
+        color: var(--text);
+        outline: none;
+    }
+
+    .search-bar input::placeholder {
+        color: var(--text-3);
+    }
+
+    .search-bar button {
+        border: none;
+        background: var(--brand-grad);
+        color: #fff;
+        padding: 0 26px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: filter 0.3s ease, transform 0.2s ease;
+    }
+
+    .search-bar button:hover {
+        filter: brightness(1.08);
+    }
+
+    .search-bar button:active {
+        transform: scale(0.96);
+    }
+
+    select option {
+        background-color: var(--panel-solid);
+        color: var(--text);
+        padding: 8px;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    /* 分类快捷按钮 */
+    .category-buttons-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 4px 12px 0;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+
+    .category-button {
+        padding: 7px 16px;
+        border-radius: 999px;
+        background: var(--panel);
+        color: var(--brand);
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.25s ease;
+        flex: 0 0 auto;
+        white-space: nowrap;
+        position: relative;
+    }
+
+    .category-button:hover {
+        background: var(--brand);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .category-button.active {
+        background: var(--brand-grad);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 0 0 3px var(--brand-soft), 0 8px 22px var(--brand-soft);
+        border-color: var(--brand);
+        font-weight: 700;
+    }
+
+    /* ---------- 右上角控制区 ---------- */
     .top-right-controls {
         position: fixed;
-        top: 10px;
-        right: 10px;
+        top: 16px;
+        right: 20px;
         display: flex;
         align-items: center;
         gap: 10px;
         z-index: 1001;
     }
 
-    /* 设置按钮样式 */
-    .admin-btn {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-
-    .admin-btn:hover {
-        background-color: #35a674;
-        transform: translateY(-1px);
-    }
-
-    body.dark-theme .admin-btn {
-        background-color: #5d7fb9;
-    }
-
-    body.dark-theme .admin-btn:hover {
-        background-color: #4a6fa5;
-    }
-
-    /* 登录按钮样式 */
+    .admin-btn,
     .login-btn {
-        background-color: #43b883;
-        color: white;
         border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
-        font-size: 13px;
+        border-radius: 999px;
+        padding: 10px 22px;
+        font-size: 15px;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 500;
+        color: #fff;
+        background: var(--brand-grad);
+        box-shadow: 0 6px 16px var(--brand-soft);
+        transition: all 0.25s ease;
     }
 
+    .admin-btn:hover,
     .login-btn:hover {
-        background-color: #35a674;
-        transform: translateY(-1px);
-    }
-
-    body.dark-theme .login-btn {
-        background-color: #5d7fb9;
-    }
-
-    body.dark-theme .login-btn:hover {
-        background-color: #4a6fa5;
-    }
-
-    /* GitHub图标按钮样式 */
-    .github-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 4px;
-        padding: 0;
-    }
-
-    .github-btn:hover {
         transform: translateY(-2px);
+        filter: brightness(1.06);
+        box-shadow: var(--shadow-md);
     }
 
-    .github-btn svg {
-        width: 24px;
-        height: 24px;
-        fill: #43b883;
-        transition: fill 0.3s ease;
+    .admin-btn:active,
+    .login-btn:active {
+        transform: translateY(0) scale(0.97);
     }
 
-    body.dark-theme .github-btn svg {
-        fill: #5d7fb9;
-    }
-
-    /* 书签搜索图标按钮样式 */
+    /* 书签搜索按钮 */
     .bookmark-search-toggle {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 0;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
-        position: relative;
+        background: var(--brand-grad);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 6px 16px var(--brand-soft);
+        transition: all 0.25s ease;
     }
 
     .bookmark-search-toggle:hover {
-        background-color: #35a674;
-        transform: translateY(-2px);
+        transform: translateY(-2px) rotate(6deg);
+        box-shadow: var(--shadow-md);
     }
 
     .bookmark-search-toggle svg {
-        width: 20px;
-        height: 20px;
-        stroke: white;
+        width: 21px;
+        height: 21px;
+        stroke: currentColor;
     }
 
-    body.dark-theme .bookmark-search-toggle {
-        background-color: #5d7fb9;
-    }
-
-    body.dark-theme .bookmark-search-toggle:hover {
-        background-color: #4a6fa5;
-    }
-
-    /* 下拉书签搜索框样式 */
     .bookmark-search-dropdown {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 10px);
         right: 0;
-        width: 140px;
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        width: 220px;
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
         padding: 8px;
-        margin-top: 4px;
         display: none;
         z-index: 1002;
     }
 
     .bookmark-search-dropdown.show {
         display: block;
+        animation: popIn 0.2s ease;
     }
 
     .bookmark-search-dropdown input {
         width: 100%;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        padding: 8px 12px;
-        font-size: 13px;
-        transition: all 0.3s ease;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 15px;
+        background-color: transparent;
+        color: var(--text);
+        outline: none;
         box-sizing: border-box;
+        transition: all 0.25s ease;
     }
 
     .bookmark-search-dropdown input:focus {
-        border-color: #43b883;
-        box-shadow: 0 0 0 2px rgba(67, 184, 131, 0.2);
-        outline: none;
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px var(--brand-soft);
     }
 
     .bookmark-search-dropdown input::placeholder {
-        color: #999;
+        color: var(--text-3);
     }
 
-    body.dark-theme .bookmark-search-dropdown {
-        background-color: #323642;
-        border-color: #444;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    body.dark-theme .bookmark-search-dropdown input {
-        background-color: #252830;
-        color: #e3e3e3;
-        border-color: #444;
-    }
-
-    body.dark-theme .bookmark-search-dropdown input::placeholder {
-        color: #888;
-    }
-
-    /* 登录弹窗样式 */
-    .login-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        backdrop-filter: blur(3px);
-    }
-
-    .login-modal-content {
-        background-color: white;
-        padding: 25px;
-        border-radius: 10px;
-        width: 300px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        animation: modalFadeIn 0.3s ease;
-    }
-
-    @keyframes modalFadeIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .login-modal h3 {
-        margin: 0 0 20px 0;
-        color: #333;
-        text-align: center;
-        font-size: 18px;
-    }
-
-    .login-modal input {
-        width: 100%;
-        margin-bottom: 15px;
-        padding: 10px;
-        border: 1px solid #e0e0e0;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
-    }
-
-    .login-modal input:focus {
-        border-color: #43b883;
-        box-shadow: 0 0 0 2px rgba(67, 184, 131, 0.2);
-        outline: none;
-    }
-
-    .login-modal-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-
-    .login-modal button {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 13px;
-    }
-
-    .login-modal button:hover {
-        background-color: #35a674;
-    }
-
-    .login-modal button.cancel {
-        background-color: #f0f0f0;
-        color: #333;
-    }
-
-    .login-modal button.cancel:hover {
-        background-color: #e0e0e0;
-    }
-
-    body.dark-theme .login-modal-content {
-        background-color: #252830;
-        color: #e3e3e3;
-    }
-
-    body.dark-theme .login-modal h3 {
-        color: #e3e3e3;
-    }
-
-    body.dark-theme .login-modal input {
-        background-color: #323642;
-        color: #e3e3e3;
-        border-color: #444;
-    }
-
-    /* 悬浮提示样式 */
-    @media (hover: hover) and (pointer: fine) {
-        .has-tooltip {
-            position: relative;
-        }
-
-        .has-tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            background: rgba(0, 0, 0, 0.75);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            white-space: nowrap;
-            z-index: 1000;
-        }
-
-        .has-tooltip::before {
-            content: "";
-            position: absolute;
-            border: 6px solid transparent;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1000;
-        }
-
-        .has-tooltip:hover::after,
-        .has-tooltip:hover::before {
-            opacity: 1;
-        }
-
-        /* 下方提示框和箭头 */
-        .tooltip-bottom::after {
-            top: 100%;
-            left: 50%;
-            margin-top: 12px;
-            transform: translateX(-50%);
-        }
-        .tooltip-bottom::before {
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-bottom-color: rgba(0, 0, 0, 0.75);
-        }
-
-        /* 绿底样式 */
-        .tooltip-green::after {
-            background: #43b883;
-            color: white;
-        }
-        .tooltip-green::before {
-            border-bottom-color: #43b883;
-        }
-
-        /* 暗色主题 */
-        body.dark-theme .has-tooltip::after {
-            background: rgba(151, 151, 151, 0.9);
-            color: #eee;
-        }
-        body.dark-theme .has-tooltip::before {
-            border-bottom-color: rgba(151, 151, 151, 0.9);
-        }
-        body.dark-theme .tooltip-green::after {
-            background: #5d7fb9;
-            color: white;
-        }
-        body.dark-theme .tooltip-green::before {
-            border-bottom-color: #5d7fb9;
-        }
-    }
-
-    /* 搜索结果样式 - 简化版 */
-    .search-results-section {
-        margin-bottom: 30px;
-    }
-
-    .search-results-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid #43b883;
-    }
-
-    body.dark-theme .search-results-header {
-        background-color: #2d3748;
-        border-left-color: #5d7fb9;
-    }
-
-    .search-results-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    body.dark-theme .search-results-title {
-        color: #e2e8f0;
-    }
-
-    .back-to-main {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .back-to-main:hover {
-        background-color: #35a674;
-    }
-
-    body.dark-theme .back-to-main {
-        background-color: #5d7fb9;
-    }
-
-    body.dark-theme .back-to-main:hover {
-        background-color: #4a6fa5;
-    }
-
-    .no-search-results {
-        text-align: center;
-        padding: 30px;
-        color: #888;
-        font-size: 16px;
-    }
-
-    body.dark-theme .no-search-results {
-        color: #a0a0a0;
-    }
-
-    /* 管理控制按钮样式 - 严格按照佬友修改版设计 */
-    .add-remove-controls {
-        display: none;
-        flex-direction: column;
-        position: fixed;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        align-items: center;
-        gap: 15px;
-        z-index: 900;
-    }
-
-    .round-btn {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        cursor: pointer;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .round-btn svg {
-        pointer-events: none;
-        display: block;
-        margin: auto;
-    }
-
-    .round-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    body.dark-theme .round-btn {
-        background-color: #5d7fb9;
-    }
-
-    .add-btn { order: 1; }
-    .remove-btn { order: 2; }
-    .category-btn { order: 3; }
-    .remove-category-btn { order: 4; }
-
-    /* 主要内容区域样式 */
+    /* ---------- 主要内容区 ---------- */
     .content {
-        margin-top: 170px;
-        padding: 10px;
+        margin-top: 230px;
+        padding: 16px 10px 60px;
         max-width: 1600px;
         margin-left: auto;
         margin-right: auto;
@@ -638,330 +490,69 @@ const HTML_CONTENT = `
         opacity: 0.6;
     }
 
-    /* 搜索栏样式 */
-    .search-container {
-        margin-top: 10px;
-        display: flex;
+    /* 管理控制按钮（管理员可见） */
+    .add-remove-controls {
+        display: none;
         flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-
-    .search-bar {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 10px;
-        width: 100%;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e0e0e0;
-        transition: all 0.3s ease;
-    }
-
-    .search-bar:focus-within {
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-        border-color: #43b883;
-    }
-
-    .search-bar select {
-        border: none;
-        background-color: #f4f7fa;
-        padding: 10px 15px;
-        font-size: 14px;
-        color: #43b883;
-        width: 120px;
-        outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="%2343b883" d="M0 0l6 6 6-6z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border-radius: 0;
-    }
-
-    /* 下拉菜单样式 */
-    select option {
-        background-color: #fff;
-        color: #333;
-        padding: 10px;
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: visible;
-    }
-
-    /* 暗色主题搜索栏样式 */
-    body.dark-theme .search-bar {
-        border-color: #323642;
-        background-color: #1e2128;
-    }
-
-    body.dark-theme .search-bar select {
-        background-color: #252830;
-        color: #5d7fb9;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6" viewBox="0 0 12 6"><path fill="%235d7fb9" d="M0 0l6 6 6-6z"/></svg>');
-    }
-
-    body.dark-theme .search-bar input {
-        background-color: #252830;
-        color: #e3e3e3;
-    }
-
-    body.dark-theme .search-bar button {
-        background-color: #5d7fb9;
-    }
-
-    body.dark-theme select option {
-        background-color: #252830;
-        color: #e3e3e3;
-        white-space: nowrap;
-        overflow: visible;
-    }
-
-    .search-bar input {
-        flex: 1;
-        border: none;
-        padding: 10px 15px;
-        font-size: 14px;
-        background-color: #fff;
-        outline: none;
-    }
-
-    .search-bar button {
-        border: none;
-        background-color: #43b883;
-        color: white;
-        padding: 0 20px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .search-bar button:hover {
-        background-color: #35a674;
-    }
-
-    /* 分类按钮容器样式 - 移至固定元素区域内 */
-    .category-buttons-container {
-        display: flex;
-        flex-wrap: wrap; /* 允许按钮换行显示 */
-        justify-content: center; /* 居中排列按钮 */
-        gap: 6px;
-        padding: 8px 12px;
-        width: 100%;
-        max-width: 1200px; /* 增加容器宽度，确保能显示更多按钮 */
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 5px; /* 减少与搜索栏的距离 */
-        background-color: transparent; /* 背景透明 */
-        border-radius: 8px;
-        box-shadow: none; /* 移除阴影 */
-        transition: all 0.3s ease;
-        position: relative; /* 确保在固定元素内正确定位 */
-    }
-
-    body.dark-theme .category-buttons-container {
-        background-color: transparent; /* 暗色模式下的背景透明 */
-        box-shadow: none;
-    }
-
-    /* 滚动条美化 */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-
-    body.dark-theme::-webkit-scrollbar-track {
-        background: #252830;
-    }
-
-    body.dark-theme::-webkit-scrollbar-thumb {
-        background: #444;
-    }
-
-    body.dark-theme::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-    /* 分类按钮容器滚动条 */
-    .category-buttons-container::-webkit-scrollbar {
-        height: 4px;
-    }
-
-    /* 浮动按钮组样式 */
-    .floating-button-group {
         position: fixed;
-        bottom: 50px;
-        right: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        z-index: 1000;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        align-items: center;
+        gap: 14px;
+        z-index: 900;
     }
 
-    .floating-button-group button {
-        width: 40px;
-        height: 40px;
+    .round-btn {
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
         border-radius: 50%;
-        font-size: 20px;
+        width: 44px;
+        height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #43b883;
-        color: white;
-        border: none;
         cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        transition: all 0.2s ease;
+        box-shadow: var(--shadow-md);
+        transition: all 0.25s ease;
     }
 
-    .floating-button-group button:hover {
-        transform: translateY(-2px);
-        background-color: #369f6b;
-    }
-
-    #back-to-top-btn {
-        display: none;
-    }
-
-    body.dark-theme .floating-button-group button {
-        background-color: #5d7fb9;
-    }
-
-    body.dark-theme .floating-button-group button:hover {
-        background-color: #4a6fa5;
-    }
-
-    /* 主题切换按钮样式 */
-    #theme-toggle {
-        font-size: 24px;
-        line-height: 40px;
-    }
-
-    /* 对话框样式 */
-    #dialog-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        backdrop-filter: blur(3px);
-        transition: all 0.3s ease;
-    }
-
-    #dialog-box {
-        background-color: white;
-        padding: 25px;
-        border-radius: 10px;
-        width: 350px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        animation: dialogFadeIn 0.3s ease;
-    }
-
-    @keyframes dialogFadeIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    #dialog-box input, #dialog-box select {
-        width: 100%;
-        margin-bottom: 15px;
-        padding: 10px;
-        border: 1px solid #e0e0e0;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    #dialog-box input:focus, #dialog-box select:focus {
-        border-color: #43b883;
-        box-shadow: 0 0 0 2px rgba(67, 184, 131, 0.2);
-        outline: none;
-    }
-
-    #dialog-box label {
+    .round-btn svg {
+        pointer-events: none;
         display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: #222;
+        margin: auto;
+        width: 24px;
+        height: 24px;
     }
 
-    #dialog-box button {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-right: 10px;
+    .round-btn:hover {
+        transform: translateY(-3px) scale(1.06);
+        box-shadow: var(--shadow-lg);
     }
 
-    #dialog-box button:hover {
-        background-color: #35a674;
+    .round-btn:active {
+        transform: translateY(0) scale(0.95);
     }
 
-    #dialog-box button.cancel {
-        background-color: #f0f0f0;
-        color: #333;
-    }
+    .add-btn { order: 1; }
+    .remove-btn { order: 2; }
+    .category-add-btn { order: 3; }
+    .category-manage-btn { order: 4; }
 
-    #dialog-box button.cancel:hover {
-        background-color: #e0e0e0;
-    }
-
-    body.dark-theme #dialog-box {
-        background-color: #252830;
-        color: #e3e3e3;
-    }
-
-    body.dark-theme #dialog-box input,
-    body.dark-theme #dialog-box select {
-        background-color: #323642;
-        color: #e3e3e3;
-        border-color: #444;
-    }
-
-    body.dark-theme #dialog-box label {
-        color: #a0b7d4;
-    }
-
-    /* 分类和卡片样式 */
+    /* ---------- 分类与卡片 ---------- */
     .section {
-        margin-bottom: 25px;
+        margin-bottom: 32px;
         padding: 0 15px;
     }
 
     .section-title-container {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         margin-bottom: 18px;
-        border-bottom: 1px solid #e0e0e0;
-        padding-bottom: 10px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line);
         transition: border-color 0.3s ease;
         width: 100%;
         max-width: 1520px;
@@ -969,973 +560,249 @@ const HTML_CONTENT = `
         margin-right: auto;
     }
 
-    body.dark-theme .section-title-container {
-        border-bottom-color: #2a2e38;
-    }
-
     .section-title {
-        font-size: 22px;
-        font-weight: 600;
-        color: #222;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
         position: relative;
-        padding-left: 15px;
+        padding-left: 16px;
+        letter-spacing: 0.5px;
         transition: color 0.3s ease;
         min-width: 120px;
     }
 
-    body.dark-theme .section-title {
-        color: #e3e3e3;
-    }
-
-    .section-title:before {
+    .section-title::before {
         content: '';
         position: absolute;
         left: 0;
         top: 50%;
         transform: translateY(-50%);
         width: 5px;
-        height: 22px;
-        background-color: #43b883;
-        border-radius: 2px;
-    }
-
-    .delete-category-btn {
-        background-color: #ff9800;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-left: 15px;
-        font-size: 13px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    }
-
-    .delete-category-btn:hover {
-        background-color: #f57c00;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    body.dark-theme .delete-category-btn {
-        background-color: #ff9800;
-        color: #252830;
-    }
-
-    .card-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, 150px);
-        column-gap: 35px;
-        row-gap: 15px;
-        justify-content: start;
-        padding: 15px;
-        padding-left: 45px;
-        margin: 0 auto;
-        max-width: 1600px;
-    }
-
-    .card {
-        background-color: white;
-        border-radius: 8px;
-        padding: 12px;
-        width: 150px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        user-select: none;
-        border-left: 3px solid #43b883;
-        animation: fadeIn 0.3s ease forwards;
-        animation-delay: calc(var(--card-index) * 0.05s);
-        opacity: 0;
-        margin: 2px;
-    }
-
-    body.dark-theme .card {
-        background-color: #1e2128; /* 卡片背景 */
-        border-left-color: #5d7fb9;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
-    }
-
-    .card-top {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-
-    .card-icon {
-        width: 26px;
         height: 26px;
-        margin-right: 5px;
-    }
-
-    .card-title {
-        font-size: 19px;
-        font-weight: 600;
-        color: #222;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: color 0.3s ease;
-    }
-
-    .card-url {
-        font-size: 12px;
-        color: #888;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: color 0.3s ease;
-    }
-
-    body.dark-theme .card-title {
-        color: #e3e3e3;
-    }
-
-    body.dark-theme .card-url {
-        color: #a0a0a0;
-    }
-
-    .private-tag {
-        background-color: #ff9800;
-        color: white;
-        font-size: 10px;
-        padding: 2px 5px;
         border-radius: 3px;
-        position: absolute;
-        top: 18px;
-        right: 5px;
-        z-index: 5;
+        background: var(--brand-grad);
+        box-shadow: 0 0 10px var(--brand-soft);
     }
 
-
-
-
-
-    /* 版权信息样式 */
-    #copyright {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 40px;
-        background-color: rgba(255, 255, 255, 0.9);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14px;
-        z-index: 1000;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
-        backdrop-filter: blur(5px);
-        transition: all 0.3s ease;
-    }
-
-    #copyright p {
-        margin: 0;
-        font-weight: 500;
-        color: #666;
-    }
-
-    #copyright a {
-        color: #43b883;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    #copyright a:after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 1px;
-        bottom: 0;
-        left: 0;
-        background-color: #43b883;
-        transform: scaleX(0);
-        transition: transform 0.3s ease;
-    }
-
-    #copyright a:hover:after {
-        transform: scaleX(1);
-    }
-
-    body.dark-theme #copyright {
-        background-color: rgba(37, 40, 48, 0.9);
-        color: #e3e3e3;
-    }
-
-    body.dark-theme #copyright a {
-        color: #5d7fb9;
-    }
-
-    body.dark-theme #copyright a:after {
-        background-color: #5d7fb9;
-    }
-
-    /* ========== 天气组件样式 ========== */
-    .weather-mini {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        background: rgba(67, 184, 131, 0.1);
-        border-radius: 16px;
+    /* 分类管理按钮 */
+    .edit-category-btn,
+    .move-category-btn {
+        background: var(--brand);
+        color: #fff;
+        border: none;
+        padding: 5px 12px;
+        margin-left: 8px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 13px;
-        margin-left: 12px;
-        vertical-align: middle;
-    }
-    .weather-mini:hover {
-        background: rgba(67, 184, 131, 0.2);
-        transform: translateY(-1px);
-    }
-    .weather-mini .weather-icon { font-size: 16px; }
-    .weather-mini .weather-temp { font-weight: 600; color: #333; }
-    .weather-mini .weather-city { color: #666; font-size: 12px; }
-    .weather-mini .weather-loading { color: #999; font-size: 12px; }
-
-    body.dark-theme .weather-mini {
-        background: rgba(93, 127, 185, 0.15);
-    }
-    body.dark-theme .weather-mini:hover {
-        background: rgba(93, 127, 185, 0.25);
-    }
-    body.dark-theme .weather-mini .weather-temp { color: #e3e3e3; }
-    body.dark-theme .weather-mini .weather-city { color: #aaa; }
-
-    /* 天气弹窗 */
-    .weather-modal {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-    }
-    .weather-modal.show { display: flex; }
-    .weather-modal-content {
-        background: #fff;
-        border-radius: 16px;
-        padding: 20px;
-        width: 90%;
-        max-width: 360px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        animation: weatherModalIn 0.25s ease;
-    }
-    @keyframes weatherModalIn {
-        from { opacity: 0; transform: scale(0.9) translateY(-20px); }
-        to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    .weather-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #eee;
-    }
-    .weather-modal-title { font-size: 16px; font-weight: 600; color: #333; }
-    .weather-modal-close {
-        background: none; border: none;
-        font-size: 20px; cursor: pointer;
-        color: #999; padding: 0; line-height: 1;
-    }
-    .weather-modal-close:hover { color: #333; }
-
-    /* 城市搜索 */
-    .weather-search {
-        position: relative;
-        margin-bottom: 16px;
-    }
-    .weather-search input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        outline: none;
-        box-sizing: border-box;
-    }
-    .weather-search input:focus { border-color: #43b883; }
-    .weather-search-results {
-        position: absolute;
-        top: 100%;
-        left: 0; right: 0;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-top: 4px;
-        max-height: 200px;
-        overflow-y: auto;
-        display: none;
-        z-index: 10;
-    }
-    .weather-search-results.show { display: block; }
-    .weather-search-item {
-        padding: 10px 12px;
-        cursor: pointer;
-        border-bottom: 1px solid #eee;
-    }
-    .weather-search-item:last-child { border-bottom: none; }
-    .weather-search-item:hover { background: #f5f5f5; }
-    .weather-search-item-name { font-weight: 500; font-size: 14px; }
-    .weather-search-item-path { font-size: 12px; color: #999; margin-top: 2px; }
-
-    /* 定位模式切换 */
-    .weather-mode-switch {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-    }
-    .weather-mode-btn {
-        flex: 1;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background: #fff;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-    }
-    .weather-mode-btn:hover { border-color: #43b883; }
-    .weather-mode-btn.active {
-        background: #43b883;
-        border-color: #43b883;
-        color: #fff;
-    }
-    body.dark-theme .weather-mode-btn {
-        background: #3a3a3a;
-        border-color: #555;
-        color: #e3e3e3;
-    }
-    body.dark-theme .weather-mode-btn:hover { border-color: #43b883; }
-    body.dark-theme .weather-mode-btn.active {
-        background: #43b883;
-        border-color: #43b883;
-        color: #fff;
-    }
-
-    /* 当前天气 */
-    .weather-current {
-        text-align: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 16px;
-    }
-    .weather-current-icon { font-size: 48px; margin-bottom: 8px; }
-    .weather-current-temp { font-size: 36px; font-weight: 300; color: #333; }
-    .weather-current-desc { font-size: 16px; color: #666; margin: 4px 0; }
-    .weather-current-detail { font-size: 13px; color: #999; }
-
-    /* 天气预报 */
-    .weather-forecast {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-    }
-    .weather-forecast-item {
-        flex: 1;
-        text-align: center;
-        padding: 12px 8px;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-    .weather-forecast-day { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 6px; }
-    .weather-forecast-icon { font-size: 24px; margin: 6px 0; }
-    .weather-forecast-temp { font-size: 12px; color: #666; }
-    .weather-forecast-temp .high { color: #e74c3c; }
-    .weather-forecast-temp .low { color: #3498db; }
-
-    /* 天气未配置状态 */
-    .weather-not-configured {
-        text-align: center;
-        padding: 40px 20px;
-        color: #999;
-        font-size: 14px;
-    }
-    .weather-search input:disabled {
-        background: #f5f5f5;
-        cursor: not-allowed;
-        color: #999;
-    }
-    body.dark-theme .weather-not-configured { color: #666; }
-    body.dark-theme .weather-search input:disabled {
-        background: #2a2e38;
-        color: #666;
-    }
-
-    /* 天气弹窗暗色主题 */
-    body.dark-theme .weather-modal-content { background: #1e2128; }
-    body.dark-theme .weather-modal-header { border-bottom-color: #333; }
-    body.dark-theme .weather-modal-title { color: #e3e3e3; }
-    body.dark-theme .weather-modal-close { color: #888; }
-    body.dark-theme .weather-modal-close:hover { color: #e3e3e3; }
-    body.dark-theme .weather-search input { background: #2a2e38; border-color: #444; color: #e3e3e3; }
-    body.dark-theme .weather-search input:focus { border-color: #5d7fb9; }
-    body.dark-theme .weather-search-results { background: #2a2e38; border-color: #444; }
-    body.dark-theme .weather-search-item:hover { background: #333; }
-    body.dark-theme .weather-search-item { border-bottom-color: #444; }
-    body.dark-theme .weather-current { border-bottom-color: #333; }
-    body.dark-theme .weather-current-temp { color: #e3e3e3; }
-    body.dark-theme .weather-current-desc { color: #aaa; }
-    body.dark-theme .weather-forecast-item { background: #2a2e38; }
-    body.dark-theme .weather-forecast-day { color: #e3e3e3; }
-    body.dark-theme .weather-forecast-temp { color: #aaa; }
-
-    /* 响应式设计 */
-    @media (max-width: 480px) {
-        .fixed-elements {
-            position: fixed; /* 恢复固定定位，确保分类按钮位置正确 */
-            padding: 8px 12px 5px 12px; /* 紧凑的内边距 */
-            height: auto;
-            min-height: 140px; /* 增加最小高度，确保有足够空间 */
-            box-shadow: none; /* 移除阴影 */
-        }
-
-        body.dark-theme .fixed-elements {
-            box-shadow: none; /* 移除阴影 */
-        }
-
-        /* 移动端一言样式调整 - 紧凑显示 */
-        #hitokoto {
-            margin: 3px 0 6px 0; /* 紧凑的上下边距 */
-            font-size: 12px; /* 减小字体 */
-            line-height: 1.3; /* 紧凑行高 */
-            padding: 0 8px; /* 左右内边距 */
-        }
-
-        .category-buttons-container {
-            width: 100%;
-            max-width: none;
-            padding: 6px;
-            overflow-x: auto; /* 允许水平滚动 */
-            flex-wrap: nowrap; /* 不允许按钮换行 */
-            justify-content: flex-start; /* 左对齐排列按钮 */
-            margin: 8px auto 5px; /* 紧凑的分类按钮边距 */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
-            background-color: transparent; /* 移动端也透明 */
-            border-radius: 8px;
-            gap: 4px; /* 减小按钮间距 */
-        }
-
-        body.dark-theme .category-buttons-container {
-            background-color: transparent;
-        }
-
-        .category-button {
-            padding: 4px 8px;
-            font-size: 11px;
-            margin: 0 1px;
-        }
-
-        .content {
-            margin-top: 150px; /* 增加顶部边距，适配更高的固定元素 */
-            margin-bottom: 100px; /* 为底部的分类按钮和版权信息留出空间 */
-            padding: 15px; /* 保持内边距 */
-            transition: opacity 0.3s ease;
-        }
-
-        /* 移动端center-content布局优化 */
-        .center-content {
-            position: static; /* 移动端使用静态定位 */
-            transform: none; /* 取消变换 */
-            width: 100%;
-            text-align: center;
-            padding: 0 8px; /* 减少左右内边距 */
-        }
-
-        .loading .content {
-            opacity: 0.6;
-        }
-
-        /* 移动端搜索容器样式 */
-        .search-container {
-            margin-top: 15px; /* 增加上边距，与右上角按钮拉开距离 */
-        }
-
-        .search-bar {
-            flex-wrap: nowrap;
-            max-width: 320px; /* 限制移动端搜索栏宽度 */
-            width: 90%; /* 相对宽度 */
-            margin: 6px auto 8px auto; /* 居中显示 */
-        }
-
-        .search-bar select {
-            width: 80px; /* 缩小选择框宽度，参考佬友修改版 */
-            flex: 0 0 auto;
-            font-size: 12px; /* 减小字体以适应更小宽度 */
-        }
-
-        .search-bar input {
-            flex: 1;
-        }
-
-        .search-bar button {
-            flex: 0 0 auto;
-        }
-
-        .admin-controls input,
-        .admin-controls button {
-            height: 36px;
-            padding: 0 10px;
-            font-size: 14px;
-        }
-
-        .category-button {
-            flex: 0 0 auto;
-            font-size: 12px;
-            padding: 5px 12px;
-            white-space: nowrap;
-            margin: 0 3px; /* 水平间距 */
-        }
-
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(140px, 1fr));
-            column-gap: 20px;
-            row-gap: 10px;
-            justify-content: center;
-            padding: 12px;
-            margin: 0 auto;
-        }
-
-        .card {
-            width: auto;
-            max-width: 100%;
-            padding: 12px;
-            margin: 0;
-            border-radius: 8px;
-        }
-
-        .card-title {
-            font-size: 13px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-
-        .card-url {
-            font-size: 11px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-
-        .add-remove-controls {
-            right: 5px;
-            bottom: 150px;
-            top: auto;
-            transform: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .round-btn {
-            right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            font-size: 20px;
-        }
-
-        .floating-button-group {
-            bottom: 20px;
-            right: 10px;
-        }
-
-        .floating-button-group button {
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
-        }
-
-        #dialog-box {
-            width: 90%;
-            max-width: 350px;
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            min-width: 100px;
-        }
-    }
-
-    /* 自定义对话框样式 */
-    .dialog-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        animation: fadeIn 0.3s ease;
-    }
-
-    .dialog-box {
-        background-color: #ffffff;
-        padding: 24px;
-        border-radius: 12px;
-        width: 340px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        transform: translateY(-20px);
-        animation: slideUp 0.3s ease forwards;
-    }
-
-    .dialog-title {
-        margin: 0 0 15px 0;
-        font-size: 18px;
-        color: #333;
-    }
-
-    .dialog-content {
-        padding: 15px 0;
-        margin-bottom: 16px;
-        font-size: 16px;
-        line-height: 1.5;
-        color: #333;
-    }
-
-    .dialog-box input[type="text"] {
-        width: 100%;
-        margin-bottom: 16px;
-        padding: 10px 12px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 14px;
-        transition: all 0.2s;
-        box-sizing: border-box;
-        background-color: #ffffff !important;
-    }
-
-    .dialog-box input[type="text"]:focus {
-        border-color: #4a90e2 !important;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-    }
-
-    .dialog-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-
-    .dialog-box button {
-        padding: 8px 16px;
-        border-radius: 6px;
-        border: none;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .dialog-confirm-btn {
-        background-color: #43b883;
-        color: white;
-    }
-
-    .dialog-confirm-btn:hover {
-        background-color: #3aa876;
-    }
-
-    .dialog-cancel-btn {
-        background-color: #f0f0f0;
-        color: #555;
-    }
-
-    .dialog-cancel-btn:hover {
-        background-color: #e0e0e0;
-    }
-
-    .top-z-index {
-        z-index: 9999;
-    }
-
-    /* 动画效果 */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-        from {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    /* 暗色主题对话框样式 */
-    body.dark-theme .dialog-box {
-        background-color: #2d3748;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    body.dark-theme .dialog-title {
-        color: #f8f9fa;
-    }
-
-    body.dark-theme .dialog-content {
-        color: #f8f9fa;
-    }
-
-    body.dark-theme .dialog-box input[type="text"] {
-        background-color: #3c4658 !important;
-        color: #e3e3e3 !important;
-        border-color: #4a5568 !important;
-    }
-
-    body.dark-theme .dialog-box input[type="text"]:focus {
-        border-color: #5a9cec !important;
-        box-shadow: 0 0 0 3px rgba(90, 156, 236, 0.3);
-    }
-
-    body.dark-theme .dialog-cancel-btn {
-        background-color: #4a5568;
-        color: #e3e3e3;
-    }
-
-    body.dark-theme .dialog-cancel-btn:hover {
-        background-color: #3c4658;
-    }
-
-    body.dark-theme .dialog-confirm-btn {
-        background-color: #5d7fb9;
-        color: white;
-    }
-
-    body.dark-theme .dialog-confirm-btn:hover {
-        background-color: #5473a9;
-    }
-
-    /* 加载遮罩样式 */
-    #loading-mask {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.6);
-        backdrop-filter: blur(4px);
-        z-index: 7000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .loading-content {
-        background-color: #fff;
-        padding: 20px 40px;
-        border-radius: 10px;
-        text-align: center;
-        box-shadow: 0 0 10px #0003;
-        font-size: 16px;
-        color: #333;
-    }
-
-    /* 加载动画 */
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #ccc;
-        border-top-color: #3498db;
-        border-radius: 50%;
-        margin: 0 auto 10px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    body.dark-theme .loading-content {
-        background-color: #2d3748;
-        color: #f8f9fa;
-    }
-
-    /* 分类管理按钮样式 */
-    .edit-category-btn, .move-category-btn {
-        background-color: #43b883;
-        color: white;
-        border: none;
-        padding: 4px 8px;
-        margin-left: 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
         display: none;
     }
 
     .edit-category-btn:hover {
-        background-color: #3aa876;
+        filter: brightness(1.1);
     }
 
     .move-category-btn {
-        background-color: #5d7fb9;
-        padding: 4px 6px;
-        min-width: 28px;
+        background: var(--accent);
+        padding: 5px 10px;
+        min-width: 30px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
     }
 
     .move-category-btn:hover {
-        background-color: #5473a9;
+        filter: brightness(1.1);
     }
 
     .move-category-btn svg {
         width: 16px;
         height: 16px;
-        fill: white;
+        fill: #fff;
     }
 
     .delete-category-btn {
-        background-color: #e74c3c;
-        color: white;
+        background: var(--danger);
+        color: #fff;
         border: none;
-        padding: 4px 8px;
+        padding: 5px 12px;
         margin-left: 8px;
-        border-radius: 4px;
-        font-size: 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
         display: none;
     }
 
     .delete-category-btn:hover {
-        background-color: #c0392b;
+        filter: brightness(1.1);
     }
 
-    /* 暗色主题下的分类管理按钮 */
-    body.dark-theme .edit-category-btn {
-        background-color: #5d7fb9;
+    /* 卡片网格 */
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 216px);
+        column-gap: 26px;
+        row-gap: 20px;
+        justify-content: start;
+        padding: 10px 15px 10px 30px;
+        margin: 0 auto;
+        max-width: 1600px;
     }
 
-    body.dark-theme .edit-category-btn:hover {
-        background-color: #5473a9;
+    /* 卡片 */
+    .card {
+        position: relative;
+        width: 216px;
+        padding: 18px 16px 16px;
+        border-radius: var(--radius);
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-left: 4px solid var(--brand);
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        cursor: pointer;
+        user-select: none;
+        margin: 2px;
+        overflow: hidden;
+        animation: cardIn 0.45s ease forwards;
+        animation-delay: calc(var(--card-index) * 0.05s);
+        opacity: 0;
+        transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, background-color 0.28s ease;
     }
 
-    body.dark-theme .move-category-btn {
-        background-color: #43b883;
+    /* 悬停光泽扫过 */
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -80%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.5s ease;
+        pointer-events: none;
     }
 
-    body.dark-theme .move-category-btn:hover {
-        background-color: #3aa876;
+    .card:hover::after {
+        left: 140%;
     }
 
-    body.dark-theme .delete-category-btn {
-        background-color: #e74c3c;
+    .card:hover {
+        transform: translateY(-6px);
+        border-color: var(--brand);
+        box-shadow: var(--shadow-md);
     }
 
-    body.dark-theme .delete-category-btn:hover {
-        background-color: #c0392b;
+    @keyframes cardIn {
+        from { opacity: 0; transform: translateY(18px) scale(0.96); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* 按钮顺序控制 */
-    .add-btn { order: 1; }
-    .remove-btn { order: 2; }
-    .category-add-btn { order: 3; }
-    .category-manage-btn { order: 4; }
-
-    /* 分类管理按钮激活状态 */
-    .category-manage-btn.active {
-        background-color: #e74c3c;
+    .card.dragging {
+        opacity: 0.85;
+        transform: scale(1.05) rotate(2deg);
+        box-shadow: var(--shadow-lg);
+        border-style: dashed;
     }
 
-    .category-manage-btn.active:hover {
-        background-color: #c0392b;
+    .card.no-hover:hover {
+        transform: none !important;
+        box-shadow: var(--shadow-sm) !important;
     }
 
-    /* 卡片描述样式 */
-    .card-tip {
-        font-size: 12px;
-        color: #666;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+    .card-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .card-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+    }
+
+    .card:hover .card-icon {
+        transform: scale(1.12) rotate(-3deg);
+    }
+
+    .card-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        line-height: 14px;
-        max-height: 28px;
-        margin-top: 5px;
+        min-width: 0;
+        transition: color 0.3s ease;
     }
 
-    body.dark-theme .card-tip {
-        color: #a0a0a0;
+    .card-url {
+        font-size: 14px;
+        color: var(--text-3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s ease;
     }
 
-    /* 卡片按钮容器 */
+    .private-tag {
+        background: var(--warn);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        position: absolute;
+        top: 14px;
+        right: 10px;
+        z-index: 5;
+    }
+
+    /* 卡片操作按钮 */
     .card-actions {
         position: absolute;
-        top: -12px;
-        right: -12px;
+        top: 8px;
+        right: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
+        gap: 5px;
         z-index: 15;
-        height: 24px;
     }
 
-    /* 卡片按钮通用样式 */
     .card-btn {
-        position: relative;
-        z-index: 1;
-        width: 24px;
-        height: 24px;
+        width: 26px;
+        height: 26px;
         border: none;
         border-radius: 50%;
-        background: #43b883;
-        color: white;
+        color: #fff;
         font-size: 12px;
         cursor: pointer;
         display: none;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
         padding: 0;
-        margin: 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
         flex-shrink: 0;
-        vertical-align: top;
     }
 
     .card-btn:hover {
-        z-index: 2;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px) scale(1.08);
+        box-shadow: var(--shadow-md);
+        filter: brightness(1.1);
     }
 
     .card-btn svg {
@@ -1948,180 +815,578 @@ const HTML_CONTENT = `
     }
 
     .edit-btn {
-        background: #43b883;
+        background: var(--brand);
     }
 
     .delete-btn {
-        background: #e74c3c;
+        background: var(--danger);
     }
 
-    body.dark-theme .edit-btn {
-        background: #5d7fb9;
+    /* ---------- 浮动按钮组 ---------- */
+    .floating-button-group {
+        position: fixed;
+        bottom: 56px;
+        right: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        z-index: 1000;
     }
 
-    body.dark-theme .delete-btn {
-        background: #e74c3c;
+    .floating-button-group button {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition: all 0.25s ease;
     }
 
-    /* 自定义提示框样式 */
+    .floating-button-group button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .floating-button-group button:active {
+        transform: scale(0.95);
+    }
+
+    #back-to-top-btn {
+        display: none;
+    }
+
+    #theme-toggle {
+        font-size: 24px;
+    }
+
+    /* ---------- 对话框 ---------- */
+    #dialog-overlay,
+    .dialog-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 14, 20, 0.45);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    #dialog-box,
+    .dialog-box {
+        width: min(420px, 92vw);
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        box-shadow: var(--shadow-lg);
+        animation: dialogIn 0.3s ease;
+    }
+
+    @keyframes dialogIn {
+        from { opacity: 0; transform: translateY(24px) scale(0.97); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #dialog-box label {
+        display: block;
+        margin: 4px 0 6px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-2);
+    }
+
+    #dialog-box input,
+    #dialog-box select,
+    .dialog-box input[type="text"] {
+        width: 100%;
+        margin-bottom: 14px;
+        padding: 11px 14px;
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        font-size: 15px;
+        background-color: transparent;
+        color: var(--text);
+        transition: all 0.25s ease;
+        box-sizing: border-box;
+    }
+
+    #dialog-box input:focus,
+    #dialog-box select:focus,
+    .dialog-box input[type="text"]:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--brand-soft);
+        outline: none;
+    }
+
+    .dialog-title {
+        margin: 0 0 14px;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .dialog-content {
+        padding: 8px 0 18px;
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--text);
+    }
+
+    .dialog-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    .dialog-confirm-btn {
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .dialog-confirm-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .dialog-cancel-btn {
+        background: #eceff3;
+        color: var(--text-2);
+        border: none;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    body.dark-theme .dialog-cancel-btn {
+        background: #2c3442;
+        color: var(--text-2);
+    }
+
+    .dialog-cancel-btn:hover {
+        background: #dfe4ea;
+    }
+
+    body.dark-theme .dialog-cancel-btn:hover {
+        background: #38414f;
+    }
+
+    .top-z-index {
+        z-index: 9999;
+    }
+
+    /* ---------- 全屏登录弹窗 ---------- */
+    .login-modal-full {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+            radial-gradient(900px 620px at 20% 12%, rgba(255, 255, 255, 0.32), transparent 60%),
+            radial-gradient(800px 600px at 85% 88%, rgba(255, 255, 255, 0.18), transparent 60%),
+            linear-gradient(160deg, var(--brand) 0%, var(--accent) 100%);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        animation: fadeIn 0.35s ease;
+    }
+
+    .login-modal-content-full {
+        width: 100vw;
+        height: 100vh;
+        box-sizing: border-box;
+        padding: 24px;
+        text-align: center;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: dialogIn 0.35s ease;
+    }
+
+    .login-modal-content-full h3 {
+        margin: 0 0 10px;
+        font-size: 46px;
+        font-weight: 800;
+        letter-spacing: 10px;
+        color: #fff;
+        text-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+    }
+
+    .login-modal-content-full input {
+        width: 100%;
+        max-width: 400px;
+        padding: 17px 22px;
+        margin: 34px 0 30px;
+        border: 2px solid rgba(255, 255, 255, 0.45);
+        border-radius: 14px;
+        font-size: 17px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.20);
+        color: #fff;
+        box-sizing: border-box;
+        outline: none;
+        transition: all 0.25s ease;
+    }
+
+    .login-modal-content-full input:focus {
+        border-color: #fff;
+        box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.25);
+    }
+
+    .login-modal-content-full input::placeholder {
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .login-modal-buttons-full {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+    }
+
+    .login-modal-buttons-full button {
+        min-width: 170px;
+        padding: 15px 44px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--brand-deep);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+        transition: all 0.25s ease;
+    }
+
+    .login-modal-buttons-full button:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .login-modal-buttons-full button:active {
+        transform: scale(0.96);
+    }
+
+    /* ---------- 搜索结果 ---------- */
+    .search-results-section {
+        margin-bottom: 30px;
+    }
+
+    .search-results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 16px 20px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: var(--radius);
+        border-left: 4px solid var(--brand);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .search-results-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .back-to-main {
+        background: var(--brand-grad);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .back-to-main:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+    }
+
+    .no-search-results {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-3);
+        font-size: 17px;
+    }
+
+    /* ---------- 自定义提示框 ---------- */
     #custom-tooltip {
         position: absolute;
         display: none;
         z-index: 700;
-        background: #43b883;
+        background: rgba(20, 28, 40, 0.92);
         color: #fff;
-        padding: 6px 10px;
-        border-radius: 5px;
-        font-size: 12px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 14px;
         pointer-events: none;
-        max-width: 300px;
+        max-width: 320px;
         white-space: pre-wrap;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        transition: opacity 0.2s ease;
+        box-shadow: var(--shadow-md);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
     }
 
-    body.dark-theme #custom-tooltip {
-        background: #5d7fb9;
-        color: #fff;
+    /* ---------- 加载遮罩 ---------- */
+    #loading-mask {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 14, 20, 0.5);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 7000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    /* 卡片悬停效果 */
-    @media (hover: hover) and (pointer: fine) {
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.3);
+    .loading-content {
+        background: var(--panel-solid);
+        border: 1px solid var(--panel-border);
+        padding: 26px 48px;
+        border-radius: var(--radius-lg);
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid var(--brand-soft);
+        border-top-color: var(--brand);
+        border-radius: 50%;
+        margin: 0 auto 14px;
+        animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ---------- 通用动画 ---------- */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    @keyframes popIn {
+        from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ---------- 响应式（移动端） ---------- */
+    @media (max-width: 480px) {
+        .fixed-elements {
+            position: fixed;
+            height: auto;
+            min-height: 148px;
+            padding: 10px 10px 6px;
+            gap: 6px;
         }
 
-        .card.no-hover:hover {
-            transform: none !important;
-            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2) !important;
+        .fixed-elements h3 {
+            gap: 10px;
+            font-size: 20px;
         }
 
-        body.dark-theme .card.no-hover:hover {
-            transform: none !important;
-            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2) !important;
+        .site-title .brand {
+            font-size: 20px;
+        }
+
+        .top-right-controls {
+            top: 10px;
+            right: 10px;
+            gap: 8px;
+        }
+
+        .admin-btn,
+        .login-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .bookmark-search-toggle {
+            width: 38px;
+            height: 38px;
+        }
+
+        .center-content {
+            padding: 0 4px;
+        }
+
+        .search-bar {
+            width: 94%;
+            max-width: 100%;
+            margin: 6px auto 8px;
+        }
+
+        .search-bar select {
+            width: 84px;
+            padding: 10px 26px 10px 14px;
+            font-size: 14px;
+        }
+
+        .search-bar input {
+            padding: 10px 14px;
+            font-size: 15px;
+        }
+
+        .search-bar button {
+            padding: 0 18px;
+        }
+
+        .category-buttons-container {
+            width: 100%;
+            max-width: none;
+            padding: 4px 2px 0;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            gap: 6px;
+            max-height: 36px;
+        }
+
+        .category-button {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .content {
+            margin-top: 152px;
+            margin-bottom: 90px;
+            padding: 12px;
+        }
+
+        .card-container {
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 14px;
+            row-gap: 12px;
+            padding: 10px;
+        }
+
+        .card {
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+        }
+
+        .card-url {
+            font-size: 12px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            min-width: 100px;
+        }
+
+        .section-title::before {
+            height: 22px;
+        }
+
+        .add-remove-controls {
+            right: 8px;
+            bottom: 120px;
+            top: auto;
+            transform: none;
+            gap: 12px;
+        }
+
+        .round-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .floating-button-group {
+            bottom: 24px;
+            right: 10px;
+            gap: 12px;
+        }
+
+        .floating-button-group button {
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+        }
+
+        #dialog-box,
+        .dialog-box {
+            width: 92%;
+            max-width: 360px;
+            padding: 22px;
+        }
+
+        .login-modal-content-full {
+            padding: 36px 24px;
+        }
+
+        .login-modal-content-full h3 {
+            font-size: 26px;
         }
     }
 
-    /* ----------   1️⃣ 全屏遮罩  ---------- */
-.login-modal-full {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(3px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-/* ----------   2️⃣ 弹窗主体  ---------- */
-.login-modal-content-full {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    background: #fff;
-    color: #222;
-    box-sizing: border-box;
-    padding: 2rem;
-    overflow: auto;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ----------   3️⃣ 标题  ---------- */
-.login-modal-content-full h3 {
-    margin: 0 0 1.5rem;
-    font-size: 1.8rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-/* ----------   4️⃣ 输入框  ---------- */
-.login-modal-content-full input {
-    width: 100%;
-    max-width: 320px;
-    padding: 0.9rem 1rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    box-sizing: border-box;
-}
-
-/* ----------   5️⃣ 按钮容器  ---------- */
-.login-modal-buttons-full {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* ----------   6️⃣ 按钮本身  ---------- */
-.login-modal-buttons-full button {
-    min-width: 80px;
-    padding: 0.6rem 1.2rem;
-    font-size: 0.95rem;
-    border: none;
-    border-radius: 0.4rem;
-    cursor: pointer;
-    transition: background-color .2s;
-}
-
-/* 取消按钮 */
-.cancel-full {
-    background: #f0f0f0;
-    color: #333;
-}
-.cancel-full:hover { background: #e0e0e0; }
-
-/* 确定按钮（主色） */
-.login-modal-buttons-full button:not(.cancel-full) {
-    background: #43b883;
-    color: #fff;
-}
-.login-modal-buttons-full button:not(.cancel-full):hover {
-    background: #35a674;
-}
-
-/* ----------   7️⃣ 暗色主题（可选）  ---------- */
-body.dark-theme .login-modal-content-full {
-    background: #252830;
-    color: #e3e3e3;
-}
-body.dark-theme .login-modal-content-full input {
-    background: #323642;
-    color: #e3e3e3;
-    border-color: #444;
-}
-body.dark-theme .cancel-full {
-    background: #4a4e5a;
-    color: #e3e3e3;
-}
-body.dark-theme .login-modal-buttons-full button:not(.cancel-full) {
-    background: #5d7fb9;
-}
-body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
-    background: #5473a9;
-}
-
+    /* 降低动效偏好 */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
     </style>
 </head>
 
 <body>
+    <!-- 顶部固定区域 -->
     <div class="fixed-elements">
-        <!-- <h3><span class="weather-mini" id="weather-mini" onclick="openWeatherModal()"><span class="weather-loading">加载中...</span></span></h3> -->
+        <!-- 站点标题 -->
+        <h3 class="site-title">
+            <span class="brand">CardTab</span>
+        </h3>
         <div class="center-content">
-            <!-- 一言模块 -->
-            <p id="hitokoto">
-                <a href="#" id="hitokoto_text"></a>
-            </p>
-            <!-- <script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script> -->
             <!-- 搜索栏 -->
             <div class="search-container">
                 <div class="search-bar">
@@ -2129,23 +1394,16 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
                         <option value="baidu">百度</option>
                         <option value="bing">必应</option>
                     </select>
-                    <input type="text" id="search-input" placeholder="">
-                    <button id="search-button">🔍</button>
+                    <input type="text" id="search-input" placeholder="搜索你想要的…">
+                    <button id="search-button" title="搜索">🔍</button>
                 </div>
             </div>
             <div id="category-buttons-container" class="category-buttons-container"></div>
         </div>
-        <!-- 右上角控制区域 -->
-        <div class="top-right-controls">            
+        <!-- 右上角控制区 -->
+        <div class="top-right-controls">
             <button class="admin-btn" id="admin-btn" onclick="toggleAdminMode()" style="display: none;">设置</button>
             <button class="login-btn" id="login-btn" onclick="handleLoginClick()">登录</button>
-            <!-- 
-            <button class="github-btn has-tooltip tooltip-bottom tooltip-green" onclick="openGitHub()" data-tooltip="喜欢请点个star">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-            </button>
-             -->
             <div class="bookmark-search-toggle" onclick="toggleBookmarkSearch()">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
@@ -2159,8 +1417,9 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             </div>
         </div>
     </div>
+
     <div class="content">
-        <!-- 管理控制按钮 -->
+        <!-- 管理控制按钮（管理员可见） -->
         <div class="add-remove-controls">
             <button class="round-btn add-btn" onclick="showAddDialog()" title="添加链接">
                 <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
@@ -2192,10 +1451,9 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             </button>
         </div>
 
-
-
         <!-- 分类和卡片容器 -->
         <div id="sections-container"></div>
+
         <!-- 浮动按钮组 -->
         <div class="floating-button-group">
             <button id="back-to-top-btn" onclick="scrollToTop()" style="display: none;">
@@ -2203,9 +1461,10 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
                     <path d="M12 24l12-12 12 12m-24 12 12-12 12 12" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </button>
-            <button id="theme-toggle" onclick="toggleTheme()">◑</button>
+            <button id="theme-toggle" onclick="toggleTheme()" title="切换主题">◑</button>
         </div>
-        <!-- 添加链接对话框 -->
+
+        <!-- 添加/编辑链接对话框 -->
         <div id="dialog-overlay">
             <div id="dialog-box">
                 <label for="name-input">名称</label>
@@ -2228,31 +1487,19 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
                 </div>
             </div>
         </div>
-        <!-- 登录弹窗 
-        <div id="login-modal" class="login-modal">
-            <div class="login-modal-content">
+
+        <!-- 登录弹窗（全屏） -->
+        <div id="login-modal" class="login-modal-full">
+            <div class="login-modal-content-full">
                 <h3>登录</h3>
                 <input type="password" id="login-password" placeholder="请输入密码">
-                <div class="login-modal-buttons">
-                    <button class="cancel" onclick="hideLoginModal()">取消</button>
+                <div class="login-modal-buttons-full">
                     <button onclick="performLogin()">确定</button>
                 </div>
             </div>
         </div>
-        -->
 
-        <div id="login-modal" class="login-modal-full">
-            <div class="login-modal-content-full">
-            <h3>登录</h3>
-            <input type="password" id="login-password" placeholder="请输入密码">
-            <div class="login-modal-buttons-full">
-                <!-- <button class="cancel-full" onclick="hideLoginModal()">取消</button> -->
-                <button onclick="performLogin()">确定</button>
-            </div>
-            </div>
-        </div>
-
-        <!-- 自定义Alert对话框 -->
+        <!-- 自定义 Alert 对话框 -->
         <div class="dialog-overlay top-z-index" id="custom-alert-overlay" style="display: none;">
             <div class="dialog-box" id="custom-alert-box">
                 <h3 class="dialog-title" id="custom-alert-title">提示</h3>
@@ -2263,7 +1510,7 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             </div>
         </div>
 
-        <!-- 自定义Confirm对话框 -->
+        <!-- 自定义 Confirm 对话框 -->
         <div class="dialog-overlay top-z-index" id="custom-confirm-overlay" style="display: none;">
             <div class="dialog-box">
                 <div class="dialog-content" id="custom-confirm-message"></div>
@@ -2278,7 +1525,7 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         <div class="dialog-overlay" id="category-dialog" style="display: none;">
             <div class="dialog-box">
                 <h3 id="category-dialog-title" class="dialog-title">新建分类</h3>
-                <input type="text" id="category-name-input" class="category-dialog-input" placeholder="请输入分类名称">
+                <input type="text" id="category-name-input" placeholder="请输入分类名称">
                 <div class="dialog-buttons">
                     <button id="category-cancel-btn" class="dialog-cancel-btn">取消</button>
                     <button id="category-confirm-btn" class="dialog-confirm-btn">确定</button>
@@ -2294,6 +1541,7 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             </div>
         </div>
     </div>
+
     <div id="custom-tooltip"></div>
 
     <script>
@@ -2349,7 +1597,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
     let isAdmin = false;
     let isLoggedIn = false;
     let removeMode = false;
-    let isRemoveCategoryMode = false;
     let isEditCategoryMode = false;
     let isDarkTheme = false;
     let links = [];
@@ -2494,17 +1741,8 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             }
         }
 
-        // 给用户提示 - 暂时使用console.log避免阻塞
-        if (isEditCategoryMode) {
-            console.log('分类编辑模式已开启');
-        } else {
-            console.log('分类编辑模式已关闭');
-        }
-
         logAction('切换分类编辑模式', { isEditCategoryMode });
     }
-
-
 
     // 渲染分类快捷按钮
     function renderCategoryButtons() {
@@ -2558,6 +1796,13 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
                 }
             });
 
+            // 按顶部固定区实际高度动态避让（分类按钮可能多行）
+            const fixedEl = document.querySelector('.fixed-elements');
+            const contentEl = document.querySelector('.content');
+            if (fixedEl && contentEl) {
+                contentEl.style.marginTop = (fixedEl.offsetHeight + 16) + 'px';
+            }
+
             // 显示或隐藏按钮容器
             if (visibleButtonsCount > 0) {
                 buttonsContainer.style.display = 'flex';
@@ -2585,10 +1830,8 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
 
         // 获取视窗高度
         const viewportHeight = window.innerHeight;
-        // 考虑固定元素的高度
-        const fixedElementsHeight = 170;
-        // 计算视窗中心点
-        const viewportCenter = viewportHeight / 2 + fixedElementsHeight;
+        // 计算视窗中心点（以几何中心为准，不额外偏移）
+        const viewportCenter = viewportHeight / 2;
 
         // 找出最接近视窗中心的分类
         let closestSection = null;
@@ -2646,12 +1889,13 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
     function scrollToCategory(category) {
         const section = document.getElementById(category);
         if (section) {
-            // 计算滚动位置，考虑顶部固定元素的高度和额外偏移量
-            let offset = 230; // 减小偏移量，确保分类标题和第一行书签完全可见
+            // 计算滚动位置：以顶部固定区实际高度为基准，避免多行分类按钮时遮挡
+            const fixedEl = document.querySelector('.fixed-elements');
+            let offset = (fixedEl ? fixedEl.offsetHeight : 230) + 80;
 
             // 检查是否为移动设备
             if (window.innerWidth <= 480) {
-                offset = 120; // 移动设备上的偏移量
+                offset = (fixedEl ? fixedEl.offsetHeight : 120) + 24;
             }
 
             // 滚动到分类位置
@@ -2691,9 +1935,7 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
                 throw new Error("HTTP error! status: " + response.status);
             }
 
-
             const data = await response.json();
-            console.log('Received data:', data);
 
             if (data.categories) {
                 Object.assign(categories, data.categories);
@@ -2719,7 +1961,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         }
     }
 
-
     // 更新UI状态
     function updateUIState() {
         const addRemoveControls = document.querySelector('.add-remove-controls');
@@ -2734,19 +1975,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         updateLoginButton();
 
         logAction('更新UI状态', { isAdmin, isLoggedIn });
-    }
-
-    // 登录状态显示（加载所有链接）
-    function showSecretGarden() {
-        if (isLoggedIn) {
-            links = [...publicLinks, ...privateLinks];
-            renderSections();
-            // 显示所有私密标签
-            document.querySelectorAll('.private-tag').forEach(tag => {
-                tag.style.display = 'block';
-            });
-            logAction('显示私密花园');
-        }
     }
 
     // 渲染分类和链接
@@ -3029,8 +2257,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         }
 
     }
-
-
 
     // 更新分类选择下拉框
     function updateCategorySelect() {
@@ -3490,7 +2716,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
             if (result.valid) {
                 isLoggedIn = true;
                 localStorage.setItem('authToken', result.token);
-                console.log('Token saved:', result.token);
                 loadLinks();
                 hideLoginModal();
                 updateLoginButton();
@@ -3521,8 +2746,15 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         showLoginModal();
     }
 
+    // 更新顶部品牌标题：登录后显示 AOE
+    function updateBrand() {
+        const brand = document.querySelector('.site-title .brand');
+        if (brand) brand.textContent = isLoggedIn ? 'AOE' : 'CardTab';
+    }
+
     // 更新按钮状态
     function updateLoginButton() {
+        updateBrand();
         const loginBtn = document.getElementById('login-btn');
         const adminBtn = document.getElementById('admin-btn');
 
@@ -3632,7 +2864,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         } else if (isAdmin) {
             isAdmin = false;
             removeMode = false;
-            isRemoveCategoryMode = false;
             isEditCategoryMode = false;
 
             // 重置分类管理按钮状态
@@ -3649,15 +2880,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
 
         updateLoginButton();
         updateUIState();
-    }
-
-
-
-    // 应用暗色主题
-    function applyDarkTheme() {
-        document.body.classList.add('dark-theme');
-        isDarkTheme = true;
-        logAction('应用暗色主题');
     }
 
     // 全局变量用于管理对话框事件处理器
@@ -3880,8 +3102,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         logAction('切换编辑卡片模式', { removeMode });
     }
 
-
-
     // 切换主题
     function toggleTheme() {
         isDarkTheme = !isDarkTheme;
@@ -4089,8 +3309,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         }
     });
 
-
-
     // 初始化加载
     document.addEventListener('DOMContentLoaded', async () => {
         try {
@@ -4117,7 +3335,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
 
     // 添加滚动事件监听器
     window.addEventListener('scroll', handleBackToTopVisibility);
-
 
     // 前端检查是否有 token
     async function validateToken() {
@@ -4161,7 +3378,6 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         isLoggedIn = false;
         isAdmin = false;
         removeMode = false;
-        isRemoveCategoryMode = false;
         isEditCategoryMode = false;
 
         updateLoginButton();
@@ -4374,343 +3590,8 @@ body.dark-theme .login-modal-buttons-full button:not(.cancel-full):hover {
         mask.style.display = 'none';
     }
 
-    // ========== 天气组件 ==========
-    const WEATHER_API = '/api/weather';  // 后端代理
-    const WEATHER_CACHE_KEY = 'card_tab_weather_cache';
-    const WEATHER_CACHE_DURATION = 30 * 60 * 1000; // 30分钟
-    const WEATHER_MODE_KEY = 'card_tab_weather_mode'; // 定位模式：ip 或 fixed
-    const WEATHER_FIXED_CITY_KEY = 'card_tab_weather_fixed_city'; // 默认城市信息
-    let weatherNotConfigured = false; // 天气服务是否未配置
-
-    // 天气图标映射
-    const WEATHER_ICONS = {
-        '100': '☀️', '150': '🌙', '101': '⛅', '102': '⛅', '103': '🌥️', '104': '☁️',
-        '151': '🌙', '152': '🌙', '153': '🌙', '154': '☁️',
-        '300': '🌦️', '301': '🌧️', '302': '⛈️', '303': '⛈️', '304': '⛈️',
-        '305': '🌧️', '306': '🌧️', '307': '🌧️', '308': '🌧️', '309': '🌧️',
-        '310': '🌧️', '311': '🌧️', '312': '🌧️', '313': '🌧️',
-        '400': '🌨️', '401': '🌨️', '402': '🌨️', '403': '🌨️', '404': '🌨️',
-        '500': '🌫️', '501': '🌫️', '502': '🌫️', '503': '🌫️', '504': '🌫️',
-        '999': '❓'
-    };
-    const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-
-    let currentWeatherLocation = null;
-    let weatherSearchTimer = null;
-
-    // 获取定位模式
-    function getWeatherMode() {
-        return localStorage.getItem(WEATHER_MODE_KEY) || 'ip';
-    }
-
-    // 设置定位模式
-    function setWeatherMode(mode) {
-        localStorage.setItem(WEATHER_MODE_KEY, mode);
-        updateWeatherModeUI();
-    }
-
-    // 获取默认城市
-    function getFixedCity() {
-        try {
-            const data = localStorage.getItem(WEATHER_FIXED_CITY_KEY);
-            return data ? JSON.parse(data) : null;
-        } catch (e) { return null; }
-    }
-
-    // 设置默认城市
-    function setFixedCity(location) {
-        localStorage.setItem(WEATHER_FIXED_CITY_KEY, JSON.stringify(location));
-    }
-
-    // 更新模式切换UI
-    function updateWeatherModeUI() {
-        const mode = getWeatherMode();
-        const ipBtn = document.getElementById('weather-mode-ip');
-        const fixedBtn = document.getElementById('weather-mode-fixed');
-        if (ipBtn && fixedBtn) {
-            ipBtn.classList.toggle('active', mode === 'ip');
-            fixedBtn.classList.toggle('active', mode === 'fixed');
-        }
-    }
-
-    // 切换到IP定位模式
-    async function switchToIPMode() {
-        setWeatherMode('ip');
-        localStorage.removeItem(WEATHER_CACHE_KEY);
-        document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">定位中...</span>';
-        await loadWeatherByIP();
-    }
-
-    // 初始化天气
-    async function initWeather() {
-        updateWeatherModeUI();
-        const mode = getWeatherMode();
-
-        // 如果是默认城市模式，优先使用默认城市
-        if (mode === 'fixed') {
-            const fixedCity = getFixedCity();
-            if (fixedCity) {
-                // 检查缓存是否有效
-                const cache = getWeatherCache();
-                if (cache && cache.location && cache.location.id === fixedCity.id && cache.now && cache.forecast) {
-                    currentWeatherLocation = cache.location;
-                    renderWeatherMini(cache.now, cache.location);
-                    renderWeatherModal(cache.now, cache.forecast, cache.location);
-                    return;
-                }
-                // 缓存无效，使用默认城市重新加载天气
-                currentWeatherLocation = fixedCity;
-                await loadWeatherData();
-                return;
-            }
-        }
-
-        // IP定位模式或没有设置默认城市
-        const cache = getWeatherCache();
-        if (cache && cache.location && cache.now && cache.forecast) {
-            currentWeatherLocation = cache.location;
-            renderWeatherMini(cache.now, cache.location);
-            renderWeatherModal(cache.now, cache.forecast, cache.location);
-            return;
-        }
-        await loadWeatherByIP();
-    }
-
-    // 获取缓存
-    function getWeatherCache() {
-        try {
-            const data = localStorage.getItem(WEATHER_CACHE_KEY);
-            if (!data) return null;
-            const cache = JSON.parse(data);
-            if (Date.now() - cache.timestamp > WEATHER_CACHE_DURATION) return null;
-            return cache;
-        } catch (e) { return null; }
-    }
-
-    // 设置缓存
-    function setWeatherCache(location, now, forecast) {
-        localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({
-            location: location, now: now, forecast: forecast, timestamp: Date.now()
-        }));
-    }
-
-    // IP定位加载天气
-    async function loadWeatherByIP() {
-        try {
-            console.log('开始IP定位...');
-            const ipRes = await fetch('https://ipapi.co/json/');
-            console.log('IP定位响应状态:', ipRes.status);
-            if (!ipRes.ok) throw new Error('IP定位失败');
-            const ipData = await ipRes.json();
-            console.log('IP定位数据:', ipData);
-            const cityName = ipData.city || ipData.region;
-            console.log('城市名称:', cityName);
-
-            const geoRes = await fetch(WEATHER_API + '/geo?location=' + encodeURIComponent(cityName) + '&number=1');
-            console.log('城市查询响应状态:', geoRes.status);
-
-            // 检查是否未配置天气服务
-            if (geoRes.status === 503) {
-                weatherNotConfigured = true;
-                renderWeatherNotConfigured(cityName);
-                return;
-            }
-
-            const geoData = await geoRes.json();
-            console.log('城市查询数据:', geoData);
-            if (geoData.code !== '200' || !geoData.location || !geoData.location.length) throw new Error('城市查询失败');
-
-            currentWeatherLocation = geoData.location[0];
-            console.log('当前天气位置:', currentWeatherLocation);
-            await loadWeatherData();
-        } catch (e) {
-            console.error('天气加载失败详细错误:', e);
-            document.getElementById('weather-mini').innerHTML = '<span class="weather-loading" title="' + e.message + '">加载失败</span>';
-        }
-    }
-
-    // 加载天气数据
-    async function loadWeatherData() {
-        if (!currentWeatherLocation) return;
-        try {
-            const [nowRes, forecastRes] = await Promise.all([
-                fetch(WEATHER_API + '/now?location=' + currentWeatherLocation.id),
-                fetch(WEATHER_API + '/3d?location=' + currentWeatherLocation.id)
-            ]);
-
-            // 检查是否未配置天气服务
-            if (nowRes.status === 503 || forecastRes.status === 503) {
-                weatherNotConfigured = true;
-                renderWeatherNotConfigured(currentWeatherLocation.name);
-                return;
-            }
-
-            const nowData = await nowRes.json();
-            const forecastData = await forecastRes.json();
-
-            if (nowData.code !== '200' || forecastData.code !== '200') throw new Error('天气API错误');
-
-            setWeatherCache(currentWeatherLocation, nowData.now, forecastData.daily);
-            renderWeatherMini(nowData.now, currentWeatherLocation);
-            renderWeatherModal(nowData.now, forecastData.daily, currentWeatherLocation);
-        } catch (e) {
-            console.warn('天气数据加载失败:', e);
-        }
-    }
-
-    // 渲染未配置天气服务的状态
-    function renderWeatherNotConfigured(cityName) {
-        // 迷你天气：城市 + --°
-        document.getElementById('weather-mini').innerHTML =
-            '<span class="weather-city">' + (cityName || '--') + '</span>' +
-            '<span class="weather-temp">--°</span>';
-        // 弹窗内容
-        document.getElementById('weather-current').innerHTML =
-            '<div class="weather-not-configured">未配置天气 Api Key</div>';
-        // 禁用搜索框
-        const searchInput = document.getElementById('weather-city-input');
-        if (searchInput) {
-            searchInput.disabled = true;
-            searchInput.placeholder = '天气服务未启用';
-        }
-    }
-
-    // 渲染迷你天气
-    function renderWeatherMini(now, location) {
-        const icon = WEATHER_ICONS[now.icon] || '❓';
-        document.getElementById('weather-mini').innerHTML =
-            '<span class="weather-city">' + location.name + '</span>' +
-            '<span class="weather-icon">' + icon + '</span>' +
-            '<span class="weather-temp">' + now.temp + '°</span>';
-    }
-
-    // 渲染天气弹窗
-    function renderWeatherModal(now, forecast, location) {
-        const icon = WEATHER_ICONS[now.icon] || '❓';
-        document.getElementById('weather-current').innerHTML =
-            '<div class="weather-current-icon">' + icon + '</div>' +
-            '<div class="weather-current-temp">' + now.temp + '°C</div>' +
-            '<div class="weather-current-desc">' + location.name + ' · ' + now.text + '</div>' +
-            '<div class="weather-current-detail">体感' + now.feelsLike + '° 湿度' + now.humidity + '% ' + now.windDir + now.windScale + '级</div>';
-
-        let forecastHtml = '';
-        forecast.slice(0, 3).forEach(function(day, i) {
-            var date = new Date(day.fxDate);
-            var dayName = i === 0 ? '今天' : WEEKDAYS[date.getDay()];
-            var dayIcon = WEATHER_ICONS[day.iconDay] || '❓';
-            forecastHtml += '<div class="weather-forecast-item">' +
-                '<div class="weather-forecast-day">' + dayName + '</div>' +
-                '<div class="weather-forecast-icon">' + dayIcon + '</div>' +
-                '<div class="weather-forecast-temp"><span class="low">' + day.tempMin + '°</span>~<span class="high">' + day.tempMax + '°</span></div>' +
-            '</div>';
-        });
-        document.getElementById('weather-forecast').innerHTML = forecastHtml;
-    }
-
-    // 弹窗控制
-    function openWeatherModal() {
-        document.getElementById('weather-modal').classList.add('show');
-    }
-    function closeWeatherModal() {
-        document.getElementById('weather-modal').classList.remove('show');
-        document.getElementById('weather-search-results').classList.remove('show');
-        document.getElementById('weather-city-input').value = '';
-    }
-    function closeWeatherModalOutside(e) {
-        if (e.target.id === 'weather-modal') closeWeatherModal();
-    }
-
-    // 城市搜索
-    async function searchWeatherCity(query) {
-        if (weatherNotConfigured) return; // 未配置时禁用搜索
-        if (weatherSearchTimer) clearTimeout(weatherSearchTimer);
-        const resultsEl = document.getElementById('weather-search-results');
-        if (query.length < 1) { resultsEl.classList.remove('show'); return; }
-
-        weatherSearchTimer = setTimeout(async function() {
-            try {
-                const res = await fetch(WEATHER_API + '/geo?location=' + encodeURIComponent(query) + '&number=8');
-                const data = await res.json();
-                if (data.code !== '200' || !data.location || !data.location.length) {
-                    resultsEl.innerHTML = '<div class="weather-search-item"><div class="weather-search-item-name">未找到城市</div></div>';
-                } else {
-                    resultsEl.innerHTML = data.location.map(function(loc) {
-                        return '<div class="weather-search-item" data-loc-id="' + loc.id + '" data-loc-name="' + loc.name + '" data-loc-adm1="' + loc.adm1 + '" data-loc-adm2="' + loc.adm2 + '">' +
-                        '<div class="weather-search-item-name">' + loc.name + '</div>' +
-                        '<div class="weather-search-item-path">' + loc.adm1 + ' · ' + loc.adm2 + '</div></div>';
-                    }).join('');
-                    // 为搜索结果添加点击事件
-                    resultsEl.querySelectorAll('.weather-search-item').forEach(function(item) {
-                        item.onclick = function() {
-                            selectWeatherCity(
-                                item.getAttribute('data-loc-id'),
-                                item.getAttribute('data-loc-name'),
-                                item.getAttribute('data-loc-adm1'),
-                                item.getAttribute('data-loc-adm2')
-                            );
-                        };
-                    });
-                }
-                resultsEl.classList.add('show');
-            } catch (e) { resultsEl.innerHTML = '<div class="weather-search-item"><div class="weather-search-item-name">搜索失败</div></div>'; resultsEl.classList.add('show'); }
-        }, 300);
-    }
-
-    // 选择城市
-    async function selectWeatherCity(id, name, adm1, adm2) {
-        currentWeatherLocation = { id: id, name: name, adm1: adm1, adm2: adm2 };
-        document.getElementById('weather-search-results').classList.remove('show');
-        document.getElementById('weather-city-input').value = '';
-        document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">加载中...</span>';
-        // 保存为默认城市并切换模式
-        setFixedCity(currentWeatherLocation);
-        setWeatherMode('fixed');
-        localStorage.removeItem(WEATHER_CACHE_KEY);
-        await loadWeatherData();
-    }
-
-    // 页面加载时初始化天气
-
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() {
-            console.log('开始初始化天气组件...');
-            initWeather().catch(function(err) {
-                console.error('天气初始化失败:', err);
-                document.getElementById('weather-mini').innerHTML = '<span class="weather-loading">加载失败</span>';
-            });
-        }, 500); // 延迟加载，优先加载主内容       
-    }); 
-
     </script>
 
-    <!-- 天气弹窗 -->
-    <div class="weather-modal" id="weather-modal" onclick="closeWeatherModalOutside(event)">
-        <div class="weather-modal-content" onclick="event.stopPropagation()">
-            <div class="weather-modal-header">
-                <span class="weather-modal-title">天气详情</span>
-                <button class="weather-modal-close" onclick="closeWeatherModal()">&times;</button>
-            </div>
-            <div class="weather-search">
-                <input type="text" id="weather-city-input" placeholder="🔍 搜索城市..." oninput="searchWeatherCity(this.value)">
-                <div class="weather-search-results" id="weather-search-results"></div>
-            </div>
-            <div class="weather-mode-switch">
-                <button class="weather-mode-btn" id="weather-mode-ip" onclick="switchToIPMode()">🌐 IP自动定位</button>
-                <button class="weather-mode-btn" id="weather-mode-fixed">📍 默认城市</button>
-            </div>
-            <div class="weather-current" id="weather-current">
-                <div class="weather-current-icon">--</div>
-                <div class="weather-current-temp">--°C</div>
-                <div class="weather-current-desc">--</div>
-                <div class="weather-current-detail">体感--° 湿度--% --</div>
-            </div>
-            <div class="weather-forecast" id="weather-forecast">
-                <div class="weather-forecast-item"><div class="weather-forecast-day">--</div><div class="weather-forecast-icon">--</div><div class="weather-forecast-temp">--</div></div>
-                <div class="weather-forecast-item"><div class="weather-forecast-day">--</div><div class="weather-forecast-icon">--</div><div class="weather-forecast-temp">--</div></div>
-                <div class="weather-forecast-item"><div class="weather-forecast-day">--</div><div class="weather-forecast-icon">--</div><div class="weather-forecast-temp">--</div></div>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
@@ -4835,117 +3716,6 @@ export default {
         return new Response(HTML_CONTENT, {
           headers: { 'Content-Type': 'text/html' }
         });
-      }
-
-      // ========== 天气代理 API ==========
-      const normalizeBaseUrl = (raw) => {
-        const value = (raw || '').trim();
-        if (!value) return null;
-        const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`;
-        return withScheme.replace(/\/+$/, '');
-      };
-
-      // 公告说明：公共 API 域名将逐步停服，建议改用你的 API Host（形如：xxx.yyy.qweatherapi.com）
-      // - devapi.qweather.com 已于 2026-01-01 停止服务
-      // - GeoAPI 使用 API Host 时需从 /v2/... 变更为 /geo/v2/...
-      const qweatherHost = normalizeBaseUrl(env.WEATHER_API_HOST);
-      const qweatherApiBase = qweatherHost || 'https://api.qweather.com';
-      const qweatherGeoBase = qweatherHost ? `${qweatherApiBase}/geo` : 'https://geoapi.qweather.com';
-
-      const proxyQWeatherJson = async (targetUrl) => {
-        const redactedUrl = targetUrl.replace(/([?&]key=)[^&]*/i, '$1***');
-        let res;
-        try {
-          res = await fetch(targetUrl);
-        } catch (err) {
-          return new Response(JSON.stringify({
-            code: '502',
-            error: 'qweather_fetch_failed',
-            upstreamUrl: redactedUrl,
-            message: String(err)
-          }), { status: 502, headers: { 'Content-Type': 'application/json' } });
-        }
-
-        const contentType = res.headers.get('content-type') || '';
-        const text = await res.text();
-
-        if (!res.ok) {
-          return new Response(JSON.stringify({
-            code: String(res.status),
-            error: 'qweather_upstream_error',
-            upstreamStatus: res.status,
-            upstreamContentType: contentType,
-            upstreamUrl: redactedUrl,
-            upstreamBody: (text || '').slice(0, 800)
-          }), { status: 502, headers: { 'Content-Type': 'application/json' } });
-        }
-
-        try {
-          if (!text) throw new Error('empty response body');
-          const data = JSON.parse(text);
-          return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
-        } catch (err) {
-          return new Response(JSON.stringify({
-            code: '502',
-            error: 'qweather_invalid_json',
-            upstreamContentType: contentType,
-            upstreamUrl: redactedUrl,
-            upstreamBody: (text || '').slice(0, 800),
-            message: String(err)
-          }), { status: 502, headers: { 'Content-Type': 'application/json' } });
-        }
-      };
-
-      if (url.pathname === '/api/weather/now') {
-        if (!env.WEATHER_API_KEY) {
-          return new Response(JSON.stringify({ code: '503', error: 'weather_not_configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        const location = url.searchParams.get('location');
-        if (!location) {
-          return new Response(JSON.stringify({ code: '400', error: 'missing location' }), {
-            status: 400, headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        return await proxyQWeatherJson(
-          `${qweatherApiBase}/v7/weather/now?location=${encodeURIComponent(location)}&key=${env.WEATHER_API_KEY}`
-        );
-      }
-
-      if (url.pathname === '/api/weather/3d') {
-        if (!env.WEATHER_API_KEY) {
-          return new Response(JSON.stringify({ code: '503', error: 'weather_not_configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        const location = url.searchParams.get('location');
-        if (!location) {
-          return new Response(JSON.stringify({ code: '400', error: 'missing location' }), {
-            status: 400, headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        return await proxyQWeatherJson(
-          `${qweatherApiBase}/v7/weather/3d?location=${encodeURIComponent(location)}&key=${env.WEATHER_API_KEY}`
-        );
-      }
-
-      if (url.pathname === '/api/weather/geo') {
-        if (!env.WEATHER_API_KEY) {
-          return new Response(JSON.stringify({ code: '503', error: 'weather_not_configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        const location = url.searchParams.get('location');
-        const number = url.searchParams.get('number') || '8';
-        if (!location) {
-          return new Response(JSON.stringify({ code: '400', error: 'missing location' }), {
-            status: 400, headers: { 'Content-Type': 'application/json' }
-          });
-        }
-        return await proxyQWeatherJson(
-          `${qweatherGeoBase}/v2/city/lookup?location=${encodeURIComponent(location)}&key=${env.WEATHER_API_KEY}&number=${number}`
-        );
       }
 
       if (url.pathname === '/api/getLinks') {
